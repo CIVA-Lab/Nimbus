@@ -1,0 +1,6 @@
+Nimbus.pro.user
+*.o
+Nimbus.app
+moc_*.cpp
+ui_*.h
+Makefile
