@@ -31,6 +31,9 @@ bool Viewer::setPointModel(const QVector<float> &points)
   if(!bindToVertexBuffer(points))
     return false;
 
+  if(m_colorBuffer.isCreated())
+    m_colorBuffer.destroy();
+
   // Find min/max extents
   float minX, maxX;
   float minY, maxY;

@@ -13,6 +13,9 @@ ICON = Nimbus.icns
 LIBS *= -framework QGLViewer
 
 INCLUDEPATH += 3rdparty/rply
+INCLUDEPATH += extern/laslib/include
+
+LIBS += -Lextern/laslib/lib -llas
 
 SOURCES += main.cpp\
         MainWindow.cpp \
@@ -21,7 +24,8 @@ SOURCES += main.cpp\
     CreatePointCloudDialog.cpp \
     3rdparty/rply/rply.c \
     PointCloud.cpp \
-    PLYLoader.cpp
+    PLYLoader.cpp \
+    LASLoader.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
@@ -29,11 +33,14 @@ HEADERS  += MainWindow.h \
     CreatePointCloudDialog.h \
     3rdparty/rply/rply.h \
     PointCloud.h \
-    PLYLoader.h
+    PLYLoader.h \
+    LASLoader.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
     CreatePointCloudDialog.ui
+
+
 
 
 

@@ -15,6 +15,7 @@
 
 #include "PointCloud.h"
 #include "PLYLoader.h"
+#include "LASLoader.h"
 
 class Sphere
 {
@@ -300,6 +301,27 @@ void MainWindow::openFile()
       m_viewer->setPointCloud(cloud);
 
       progress.close();
+
+      return;
+    }
+  }
+
+  if(LASLoader::canRead(path))
+  {
+    LASLoader loader;
+    if(loader.open(path))
+    {
+      QProgressDialog progress(this);
+      progress.setWindowModality(Qt::WindowModal);
+      progress.setRange(0, 100);
+      progress.setMinimumDuration(1000);
+
+      connect(&loader, SIGNAL(progress(int)), &progress, SLOT(setValue(int)));
+      connect(&progress, SIGNAL(canceled()), &loader, SLOT(cancel()));
+
+      PointCloud cloud = loader.load();
+      cloud.shuffle();
+      m_viewer->setPointCloud(cloud);
 
       return;
     }
