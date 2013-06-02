@@ -19,17 +19,25 @@ SOURCES += main.cpp\
     Viewer.cpp \
     DisplayOptionsDialog.cpp \
     CreatePointCloudDialog.cpp \
-    3rdparty/rply/rply.c
+    3rdparty/rply/rply.c \
+    PointCloud.cpp \
+    PLYLoader.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
     DisplayOptionsDialog.h \
     CreatePointCloudDialog.h \
-    3rdparty/rply/rply.h
+    3rdparty/rply/rply.h \
+    PointCloud.h \
+    PLYLoader.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
     CreatePointCloudDialog.ui
+
+
+
+
 
 
 

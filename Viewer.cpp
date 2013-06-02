@@ -23,6 +23,10 @@ Viewer::Viewer(QWidget *parent) :
 
 bool Viewer::setPointModel(const QVector<float> &points)
 {
+  // Make sure vector is not empty
+  if(points.isEmpty())
+    return false;
+
   // Bind points to VBO
   if(!bindToVertexBuffer(points))
     return false;
@@ -65,6 +69,37 @@ bool Viewer::setPointModel(const QVector<float> &points)
   showEntireScene();
 
   // Restore point density to 100%; will also trigger point count display
+  setPointDensity(100);
+
+  return true;
+}
+
+bool Viewer::setPointCloud(const PointCloud &cloud)
+{
+  if(!bindToVertexBuffer(cloud.pointData()))
+    return false;
+
+  if(cloud.hasColor())
+  {
+    if(!loadColorsToBuffer(cloud.colorData()))
+    {
+      qDebug() << "Failed loading color data.";
+      return false;
+    }
+  } else {
+    if(m_colorBuffer.isCreated())
+    {
+      m_colorBuffer.destroy();
+    }
+  }
+
+  QVector3D min = cloud.boundingBoxMinimum();
+  QVector3D max = cloud.boundingBoxMaximum();
+
+  setSceneBoundingBox(qglviewer::Vec(min.x(), min.y(), min.z()),
+                      qglviewer::Vec(max.x(), max.y(), max.z()));
+
+  showEntireScene();
   setPointDensity(100);
 
   return true;
@@ -178,6 +213,10 @@ void Viewer::init()
 
   qDebug() << "Depth size" << format().depthBufferSize();
   qDebug() << "Alpha size" << format().alphaBufferSize();
+  qDebug() << "Red size" << format().redBufferSize();
+  GLint redBits;
+  glGetIntegerv(GL_RED_BITS, &redBits);
+  qDebug() << "Red bits" << redBits;
   qDebug() << "Multisample" << format().testOption(QGL::SampleBuffers);
   qDebug() << "OpenGL Version flags" << format().openGLVersionFlags();
   qDebug().nospace() << "OpenGL Version " << format().majorVersion() << "."
@@ -212,10 +251,21 @@ void Viewer::draw()
   if(m_colorPoints)
     glEnableClientState(GL_COLOR_ARRAY);
 
-  m_vertexBuffer.bind();
-  glVertexPointer(3, GL_FLOAT, 0, 0);
-  glColorPointer(3, GL_FLOAT, 0, 0);
-  m_vertexBuffer.release();
+  if(!m_colorBuffer.isCreated())
+  {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glColorPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+  } else {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+
+    m_colorBuffer.bind();
+    glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
+    m_colorBuffer.release();
+  }
 
   glDrawArrays(GL_POINTS, 0, m_vertexCount * m_density/100.0);
 
@@ -256,6 +306,30 @@ bool Viewer::bindToVertexBuffer(const QVector<float> &vertices)
                           vertices.count() * sizeof(float));
 
   m_vertexCount = vertices.count()/3;
+
+  return glGetError() == GL_NO_ERROR;
+}
+
+bool Viewer::loadColorsToBuffer(const QVector<unsigned char> &colors)
+{
+  // Ensure RGB
+  if(colors.count() % 3)
+    return false;
+
+  // Make context current
+  makeCurrent();
+
+  if(m_colorBuffer.isCreated())
+    m_colorBuffer.destroy();
+
+  if(!m_colorBuffer.create())
+    return false;
+
+  if(!m_colorBuffer.bind())
+    return false;
+
+  m_vertexBuffer.allocate(colors.constData(),
+                          colors.count() * sizeof(unsigned char));
 
   return glGetError() == GL_NO_ERROR;
 }

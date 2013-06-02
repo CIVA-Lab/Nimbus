@@ -13,6 +13,9 @@
 
 #include "rply.h"
 
+#include "PointCloud.h"
+#include "PLYLoader.h"
+
 class Sphere
 {
 public:
@@ -270,30 +273,6 @@ void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
   m_viewer->setPointModel(points);
 }
 
-// Error callback for rply.  Hides default message handler
-static void plyErrorCallback(p_ply ply, const char *message)
-{
-  // No op
-  Q_UNUSED(ply)
-  Q_UNUSED(message)
-}
-
-static int vertexCallback(p_ply_argument arg)
-{
-  QVector<float> *points;
-
-  ply_get_argument_user_data(arg, (void **)&points, NULL);
-  points->push_back(ply_get_argument_value(arg));
-
-  return 1;
-}
-
-int randomInt(int min, int max)
-{
-  double r = (double)qrand()/RAND_MAX;
-  return min + r * (max - min);
-}
-
 void MainWindow::openFile()
 {
   // Get file to open
@@ -301,65 +280,33 @@ void MainWindow::openFile()
 
   if(path.isEmpty()) return;
 
-  QVector<float> points;
-
-  // For now only support ply files using rply
-  p_ply ply = ply_open(path.toLocal8Bit().constData(), plyErrorCallback, 0,
-                       NULL);
-
-  // If open failure
-  if(!ply)
+  // Try to open PLY file
+  if(PLYLoader::canRead(path))
   {
-    QMessageBox::critical(this, "Unable to open file",
-                          "Failed to open " + path);
-    return;
+    PLYLoader loader;
+    if(loader.open(path))
+    {
+      QProgressDialog progress(this);
+      progress.setWindowModality(Qt::WindowModal);
+      progress.setRange(0, 100);
+      progress.setMinimumDuration(1000);
+      progress.setAutoClose(false);
+
+      connect(&loader, SIGNAL(progress(int)), &progress, SLOT(setValue(int)));
+      connect(&progress, SIGNAL(canceled()), &loader, SLOT(cancel()));
+
+      PointCloud cloud = loader.load();
+      cloud.shuffle();
+      m_viewer->setPointCloud(cloud);
+
+      progress.close();
+
+      return;
+    }
   }
 
-  if(!ply_read_header(ply))
-  {
-    QMessageBox::critical(this, "Unable to open file",
-                          path + " is not a PLY file.");
-    return;
-
-  }
-
-  // Register read callback
-  int numPoints = ply_set_read_cb(ply, "vertex", "x", vertexCallback, &points, 0);
-  ply_set_read_cb(ply, "vertex", "y", vertexCallback, &points, 0);
-  ply_set_read_cb(ply, "vertex", "z", vertexCallback, &points, 0);
-
-  qDebug() << "Expecting" << numPoints << "vertices.";
-
-  if(!ply_read(ply))
-  {
-    QMessageBox::critical(this, "Failed reading file", "Failed reading " +
-                          path);
-    return;
-  }
-
-  qDebug() << "Got" << points.count()  << "points!";
-
-  // Shuffle vector using "Knuth Shuffle"
-  int vertexCount = points.count()/3;
-
-  for(int i = vertexCount - 1; i > 0; i--)
-  {
-    int j = randomInt(0, i);
-
-    float tmp = points.at(i * 3 + 0);
-    points[i * 3 + 0] = points.at(j * 3 + 0);
-    points[j * 3 + 0] = tmp;
-
-    tmp = points.at(i * 3 + 1);
-    points[i * 3 + 1] = points.at(j * 3 + 1);
-    points[j * 3 + 1] = tmp;
-
-    tmp = points.at(i * 3 + 2);
-    points[i * 3 + 2] = points.at(j * 3 + 2);
-    points[j * 3 + 2] = tmp;
-  }
-
-  m_viewer->setPointModel(points);
+  QMessageBox::critical(this, "Unable to open file",
+                        path + " is not a PLY file.");
 }
 
 MainWindow::~MainWindow()
