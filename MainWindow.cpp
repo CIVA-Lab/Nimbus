@@ -9,7 +9,7 @@
 
 #include <QProgressDialog>
 #include <QFileDialog>
-#include <QMessageBox.h>
+#include <QMessageBox>
 
 #include "rply.h"
 
