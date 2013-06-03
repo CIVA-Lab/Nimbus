@@ -328,7 +328,7 @@ void MainWindow::openFile()
   }
 
   QMessageBox::critical(this, "Unable to open file",
-                        path + " is not a PLY file.");
+                        path + " is not a supported format.");
 }
 
 MainWindow::~MainWindow()

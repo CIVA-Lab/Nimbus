@@ -2,6 +2,7 @@
 #include <QVector>
 #include <QVector3D>
 #include <QColor>
+#include <QFile>
 #include <QDebug>
 
 #include <limits>
@@ -17,11 +18,22 @@ LASLoader::~LASLoader()
 
 bool LASLoader::canRead(const QString &path)
 {
+  QFile lasFile(path);
+  if(!lasFile.open(QIODevice::ReadOnly))
+  {
+    return false;
+  }
+
+  // Check magic number; laslib will attempt to read invalid files
+  if(lasFile.read(4) != "LASF")
+    return false;
+
   LASreadOpener opener;
 
   opener.set_file_name(path.toLocal8Bit().constData());
   LASreader* reader = opener.open();
 
+  qDebug() << "After open attempt by laslib";
   bool result = (reader != NULL);
 
   delete reader;
