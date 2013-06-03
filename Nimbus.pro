@@ -10,7 +10,14 @@ TARGET = Nimbus
 TEMPLATE = app
 ICON = Nimbus.icns
 
+macx {
 LIBS *= -framework QGLViewer
+}
+
+unix:!macx {
+INCLUDEPATH += extern/QGLViewer/include
+LIBS += -Lextern/QGLViewer/lib -lQGLViewer
+}
 
 INCLUDEPATH += 3rdparty/rply
 INCLUDEPATH += extern/laslib/include
