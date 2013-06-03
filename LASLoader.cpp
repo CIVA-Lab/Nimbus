@@ -33,7 +33,6 @@ bool LASLoader::canRead(const QString &path)
   opener.set_file_name(path.toLocal8Bit().constData());
   LASreader* reader = opener.open();
 
-  qDebug() << "After open attempt by laslib";
   bool result = (reader != NULL);
 
   delete reader;
