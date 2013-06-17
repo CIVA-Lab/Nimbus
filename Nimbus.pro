@@ -12,6 +12,16 @@ ICON = Nimbus.icns
 
 macx {
 LIBS *= -framework QGLViewer
+
+INCLUDEPATH *= extern/macx/include
+LIBS *= -Lextern/macx/lib -llas
+
+INCLUDEPATH *= /opt/local/include
+}
+
+win32 {
+INCLUDEPATH *= extern/win32/include
+LIBS *= -Lextern/win32/lib -llas -lQGLViewer
 }
 
 unix:!macx {
@@ -46,17 +56,3 @@ HEADERS  += MainWindow.h \
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
     CreatePointCloudDialog.ui
-
-
-
-
-
-
-
-
-
-
-
-
-
-

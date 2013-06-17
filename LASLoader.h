@@ -2,7 +2,8 @@
 #define LASLOADER_H
 #include <QObject>
 #include <QString>
-#include "lasreader.hpp"
+//#include <liblas/liblas.hpp>
+#include <fstream>
 #include "PointCloud.h"
 
 class LASLoader : public QObject
@@ -27,7 +28,7 @@ public slots:
 
 private:
   int m_pointCount;
-  LASreader* m_reader;
+  QString m_path;
 
   bool m_cancel;
 };

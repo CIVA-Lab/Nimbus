@@ -1,89 +1,118 @@
 #include "LASLoader.h"
+#include <liblas/liblas.hpp>
+#include <fstream>
 #include <QVector>
 #include <QVector3D>
 #include <QColor>
-#include <QFile>
 #include <QDebug>
 
-#include <limits>
-
-LASLoader::LASLoader(QObject *parent) : QObject(parent), m_pointCount(0),
-  m_reader(NULL), m_cancel(false)
+LASLoader::LASLoader(QObject *parent) :
+  QObject(parent), m_cancel(false)
 {
 }
 
 LASLoader::~LASLoader()
 {
+
 }
 
 bool LASLoader::canRead(const QString &path)
 {
-  QFile lasFile(path);
-  if(!lasFile.open(QIODevice::ReadOnly))
-  {
-    return false;
+  bool result = true;
+
+  try {
+  // Open file stream
+  std::ifstream ifs;
+  ifs.open(path.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
+
+  // Get reader from factory
+  liblas::ReaderFactory f;
+  liblas::Reader reader = f.CreateWithStream(ifs);
+
+  // Get header
+  liblas::Header const& header = reader.GetHeader();
+
+  result = (header.GetFileSignature() == "LASF");
+
+  } catch (std::exception){
+    result = false;
   }
-
-  // Check magic number; laslib will attempt to read invalid files
-  if(lasFile.read(4) != "LASF")
-    return false;
-
-  LASreadOpener opener;
-
-  opener.set_file_name(path.toLocal8Bit().constData());
-  LASreader* reader = opener.open();
-
-  bool result = (reader != NULL);
-
-  delete reader;
 
   return result;
 }
 
 bool LASLoader::open(const QString &path)
 {
-  LASreadOpener opener;
+  bool result = true;
 
-  opener.set_file_name(path.toLocal8Bit().constData());
-  m_reader = opener.open();
+  try {
+  // Open file stream
+  std::ifstream ifs;
+  ifs.open(path.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 
-  if(!m_reader) return false;
+  // Get reader from factory
+  liblas::ReaderFactory f;
+  liblas::Reader reader = f.CreateWithStream(ifs);
 
-  m_pointCount = m_reader->npoints;
+  // Get header
+  liblas::Header const& header = reader.GetHeader();
 
-  return true;
+  result = (header.GetFileSignature() == "LASF");
+
+  m_pointCount = header.GetPointRecordsCount();
+
+  } catch (std::exception){
+    result = false;
+  }
+
+  m_path = path;
+
+  return result;
 }
 
 PointCloud LASLoader::load()
 {
-  if(!m_reader) return PointCloud();
+  try {
+  // Open file stream
+  std::ifstream ifs;
+  ifs.open(m_path.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 
-  QVector<QVector3D> points;
-  QVector<QColor> color;
+  qDebug() << "File stream opened";
+
+  // Get reader from factory
+  liblas::ReaderFactory f;
+  liblas::Reader reader = f.CreateWithStream(ifs);
+
+  // Get header
+  liblas::Header const& header = reader.GetHeader();
+
+  m_pointCount = header.GetPointRecordsCount();
+
+
+  liblas::Schema const& schema = header.GetSchema();
+  bool hasColor = schema.GetDimension("Red")
+      || schema.GetDimension("Green")
+      || schema.GetDimension("Blue");
 
   int step = qMax(1.0, m_pointCount/100.0);
 
-  while(m_reader->read_point())
+  QVector<QVector3D> points;
+  QVector<QColor> colors;
+
+  while(reader.ReadNextPoint())
   {
-    points.push_back(QVector3D(m_reader->point.x,
-                                 m_reader->point.y,
-                                 m_reader->point.z));
-    if(m_reader->point.have_rgb)
+    liblas::Point const& p = reader.GetPoint();
+
+    if(hasColor)
     {
-      quint16 red = m_reader->point.rgb[0];
-      quint16 green = m_reader->point.rgb[1];
-      quint16 blue = m_reader->point.rgb[2];
-
-      QColor c;
-
-      quint16 max = std::numeric_limits<quint16>::max();
-
-      c.setRedF((qreal)red/max);
-      c.setGreenF((qreal)green/max);
-      c.setBlueF((qreal)blue/max);
-
-      color.push_back(c);
+      liblas::Color const& c = p.GetColor();
+      QColor color;
+      color.setRedF(c.GetRed()/65535.0);
+      color.setGreenF(c.GetGreen()/65535.0);
+      color.setBlueF(c.GetBlue()/65535.0);
+      colors.push_back(color);
     }
+    points.push_back(QVector3D(p.GetX(), p.GetY(), p.GetZ()));
 
     if(m_cancel)
       return PointCloud();
@@ -94,11 +123,16 @@ PointCloud LASLoader::load()
     }
   }
 
-  return PointCloud(points, color);
+  return PointCloud(points, colors);
+
+  } catch (std::exception){
+    qDebug() << "Got an exception!";
+  }
+
+  return PointCloud();
 }
 
 void LASLoader::cancel()
 {
   m_cancel = true;
 }
-
