@@ -24,6 +24,7 @@ CONFIG += static
 DEFINES += QGLVIEWER_STATIC
 INCLUDEPATH += extern/win32/include
 LIBS += -L../extern/win32/lib -llas -lQGLViewer
+RC_FILE = Nimbus.rc
 }
 
 unix:!macx {
@@ -58,3 +59,18 @@ HEADERS  += MainWindow.h \
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
     CreatePointCloudDialog.ui
+
+OTHER_FILES += \
+    Nimbus.rc
+
+RESOURCES += \
+    Nimbus.qrc
+
+CONFIG(static):{
+  message(Static compile enabled)
+  DEFINES += NIMBUS_STATIC
+  QTPLUGIN += \
+      qico
+}
+
+

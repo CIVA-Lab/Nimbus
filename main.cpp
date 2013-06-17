@@ -1,6 +1,12 @@
 #include <QtGui/QApplication>
+#include <QtPlugin>
 #include "MainWindow.h"
 #include "Viewer.h"
+
+// Needed for static windows build
+#ifdef NIMBUS_STATIC
+Q_IMPORT_PLUGIN(qico)
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -8,8 +14,9 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-//    Viewer v;
-//    v.show();
+    // Needed to set icon for windows
+    Q_INIT_RESOURCE(Nimbus);
+    w.setWindowIcon(QIcon(":/Nimbus.ico"));
 
     return a.exec();
 }
