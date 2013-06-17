@@ -9,6 +9,11 @@
 
 using namespace qglviewer;
 
+// Necessary for older windows OpenGL
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE  0x809D
+#endif
+
 Viewer::Viewer(QWidget *parent) :
   QGLViewer(parent),
   m_vertexCount(0),

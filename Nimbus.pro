@@ -20,8 +20,10 @@ INCLUDEPATH *= /opt/local/include
 }
 
 win32 {
-INCLUDEPATH *= extern/win32/include
-LIBS *= -Lextern/win32/lib -llas -lQGLViewer
+CONFIG += static
+DEFINES += QGLVIEWER_STATIC
+INCLUDEPATH += extern/win32/include
+LIBS += -L../extern/win32/lib -llas -lQGLViewer
 }
 
 unix:!macx {
@@ -30,9 +32,9 @@ LIBS += -Lextern/QGLViewer/lib -lQGLViewer
 }
 
 INCLUDEPATH += 3rdparty/rply
-INCLUDEPATH += extern/laslib/include
+# INCLUDEPATH += extern/laslib/include
 
-LIBS += -Lextern/laslib/lib -llas
+# LIBS += -Lextern/laslib/lib -llas
 
 SOURCES += main.cpp\
         MainWindow.cpp \

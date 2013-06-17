@@ -1,12 +1,13 @@
 #include "CreatePointCloudDialog.h"
 #include "ui_CreatePointCloudDialog.h"
+#include <climits>
 
 CreatePointCloudDialog::CreatePointCloudDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CreatePointCloudDialog)
 {
     ui->setupUi(this);
-    ui->pointCountSpinBox->setMaximum(RAND_MAX);
+    ui->pointCountSpinBox->setMaximum(INT_MAX);
     ui->pointCountSpinBox->setValue(100000);
     ui->volumeRadioButton->setChecked(true);
 
