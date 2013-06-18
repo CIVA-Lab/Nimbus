@@ -10,13 +10,14 @@ Q_IMPORT_PLUGIN(qico)
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(Nimbus);
+
     QApplication a(argc, argv);
+    // Set application wide icon; needed for static windows builds
+    a.setWindowIcon(QIcon(":/Nimbus.ico"));
+
     MainWindow w;
     w.show();
-
-    // Needed to set icon for windows
-    Q_INIT_RESOURCE(Nimbus);
-    w.setWindowIcon(QIcon(":/Nimbus.ico"));
 
     return a.exec();
 }
