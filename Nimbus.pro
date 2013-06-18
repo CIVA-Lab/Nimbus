@@ -23,7 +23,7 @@ win32 {
 CONFIG += static
 DEFINES += QGLVIEWER_STATIC
 INCLUDEPATH += extern/win32/include
-LIBS += -L../extern/win32/lib -llas -lQGLViewer
+LIBS += -L../extern/win32/lib -llas -llaszip -lQGLViewer
 RC_FILE = Nimbus.rc
 }
 
