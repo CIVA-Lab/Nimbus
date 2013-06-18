@@ -162,6 +162,8 @@ MainWindow::MainWindow(QWidget *parent) :
     format.setSwapInterval(1);
     // Enable sample buffers
     format.setOption(QGL::SampleBuffers);
+    // Request alpha buffer
+    format.setAlpha(true);
     // Update default OpenGL format
     QGLFormat::setDefaultFormat(format);
 
