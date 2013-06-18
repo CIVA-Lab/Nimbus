@@ -20,6 +20,7 @@ INCLUDEPATH *= /opt/local/include
 }
 
 win32 {
+CONFIG += console
 CONFIG += static
 DEFINES += QGLVIEWER_STATIC
 INCLUDEPATH += extern/win32/include

@@ -214,10 +214,10 @@ void Viewer::setMultisample(bool value)
 void Viewer::init()
 {
   // See if shader programs are available
-//  if(QGLShaderProgram::hasOpenGLShaderPrograms())
-//  {
-//    qDebug() << "Shader programs supported!";
-//  }
+  if(QGLShaderProgram::hasOpenGLShaderPrograms())
+  {
+    qDebug() << "Shader programs supported!";
+  }
 
   qDebug() << "Depth size" << format().depthBufferSize();
   qDebug() << "Alpha size" << format().alphaBufferSize();

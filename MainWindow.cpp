@@ -281,8 +281,12 @@ void MainWindow::openFile()
   // Get file to open
   QString path = QFileDialog::getOpenFileName(this, "Open File");
 
-  if(path.isEmpty()) return;
+  if(!path.isEmpty())
+    openFile(path);
+}
 
+void MainWindow::openFile(const QString &path)
+{
   // Try to open PLY file
   if(PLYLoader::canRead(path))
   {
@@ -331,6 +335,11 @@ void MainWindow::openFile()
 
   QMessageBox::critical(this, "Unable to open file",
                         path + " is not a supported format.");
+}
+
+void MainWindow::closeEvent(QCloseEvent *)
+{
+  qApp->quit();
 }
 
 MainWindow::~MainWindow()
