@@ -382,7 +382,14 @@ void MainWindow::dropEvent(QDropEvent *e)
       QString path = e->mimeData()->urls().at(0).toLocalFile();
 
       e->accept();
-      openFile(path);
+
+      // The following queues the opening of the file by invoking openFile as
+      // a queued slot call.  This causes the dropEvent to be handled
+      // immediately, and the file to be opened on return to the event loop.
+      // Keeps the mouse pointer from becoming a wait pointer and makes the
+      // gui more responsive.
+      QMetaObject::invokeMethod(this, "openFile", Qt::QueuedConnection,
+                                Q_ARG(QString, path));
     }
   }
 }
