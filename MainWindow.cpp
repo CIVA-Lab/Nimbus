@@ -355,6 +355,7 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
 {
+  qDebug() << "Drop action:" << e->dropAction();
   if(e->mimeData()->hasUrls())
   {
     if(e->mimeData()->urls().count() == 1)
@@ -364,7 +365,9 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *e)
 
       if(canRead(path))
       {
-        e->acceptProposedAction();
+        // Force copy action (for correct mouse pointer icon)
+        e->setDropAction(Qt::CopyAction);
+        e->accept();
       } else {
         e->ignore();
       }
