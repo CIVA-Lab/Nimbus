@@ -4,6 +4,10 @@
 #include <QGLFormat>
 #include <QDebug>
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QUrl>
+
 #include <QVector>
 #include <QtCore/qmath.h>
 
@@ -231,6 +235,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_viewer->setPointDensity(100);
 
     resize(800,600);
+
+    setAcceptDrops(true);
 }
 
 void MainWindow::loadSphereVolume(int pointCount)
@@ -337,9 +343,48 @@ void MainWindow::openFile(const QString &path)
                         path + " is not a supported format.");
 }
 
+bool MainWindow::canRead(const QString &path)
+{
+  return LASLoader::canRead(path) || PLYLoader::canRead(path);
+}
+
 void MainWindow::closeEvent(QCloseEvent *)
 {
   qApp->quit();
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *e)
+{
+  if(e->mimeData()->hasUrls())
+  {
+    if(e->mimeData()->urls().count() == 1)
+    {
+      // See if file can be read
+      QString path = e->mimeData()->urls().at(0).toLocalFile();
+
+      if(canRead(path))
+      {
+        e->acceptProposedAction();
+      } else {
+        e->ignore();
+      }
+    }
+  }
+}
+
+void MainWindow::dropEvent(QDropEvent *e)
+{
+  if(e->mimeData()->hasUrls())
+  {
+    if(e->mimeData()->urls().count() == 1)
+    {
+      // See if file can be read
+      QString path = e->mimeData()->urls().at(0).toLocalFile();
+
+      e->accept();
+      openFile(path);
+    }
+  }
 }
 
 MainWindow::~MainWindow()

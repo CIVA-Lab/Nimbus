@@ -27,6 +27,8 @@ public:
   QVector<float> GeneratePointSurface(int count, Shape shape,
                                       double epsilon = 0.01);
 
+  bool canRead(const QString& path);
+
 public slots:
   void openFile();
   void openFile(const QString& path);
@@ -36,6 +38,8 @@ public slots:
 
 protected:
   void closeEvent(QCloseEvent *);
+  void dragEnterEvent(QDragEnterEvent *);
+  void dropEvent(QDropEvent *);
 
 private:
   Ui::MainWindow *ui;
