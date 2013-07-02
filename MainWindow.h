@@ -33,7 +33,7 @@ public slots:
   void openFile();
   void openFile(const QString& path);
 
-  void loadSphereVolume(int pointCount);
+//  void loadSphereVolume(int pointCount);
   void createPointCloud(QString shape, int points, bool asSurface);
 
 protected:

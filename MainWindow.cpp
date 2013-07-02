@@ -239,11 +239,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setAcceptDrops(true);
 }
 
-void MainWindow::loadSphereVolume(int pointCount)
-{
-  m_viewer->setPointModel(GeneratePointVolume(pointCount, Sphere()));
-}
-
 void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
 {
   QVector<float> points;
