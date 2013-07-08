@@ -213,6 +213,7 @@ void Viewer::setMultisample(bool value)
 
 void Viewer::init()
 {
+#ifdef DEBUG_GL_CAPABILITIES
   // See if shader programs are available
   if(QGLShaderProgram::hasOpenGLShaderPrograms())
   {
@@ -237,6 +238,7 @@ void Viewer::init()
   qDebug() << "Vertex shader:" << QGLShader::hasOpenGLShaders(QGLShader::Vertex);
   qDebug() << "Geometry shader:" << QGLShader::hasOpenGLShaders(QGLShader::Geometry);
   qDebug() << "Fragment shader:" << QGLShader::hasOpenGLShaders(QGLShader::Fragment);
+#endif
 
   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
