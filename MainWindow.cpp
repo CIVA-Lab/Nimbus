@@ -350,7 +350,6 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
 {
-  qDebug() << "Drop action:" << e->dropAction();
   if(e->mimeData()->hasUrls())
   {
     if(e->mimeData()->urls().count() == 1)
