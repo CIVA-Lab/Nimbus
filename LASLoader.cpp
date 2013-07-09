@@ -77,8 +77,6 @@ PointCloud LASLoader::load()
   std::ifstream ifs;
   ifs.open(m_path.toLocal8Bit().constData(), std::ios::in | std::ios::binary);
 
-  qDebug() << "File stream opened";
-
   // Get reader from factory
   liblas::ReaderFactory f;
   liblas::Reader reader = f.CreateWithStream(ifs);
