@@ -22,6 +22,7 @@ signals:
   void pointColorChanged(bool value);
   void pointDepthChanged(bool value);
   void multiSampleChanged(bool value);
+  void fastInteractionChanged(bool value);
 
 public slots:
   void setPointSize(int pointSize);
@@ -31,6 +32,7 @@ public slots:
   void setDepthMask(bool mask);
   void setMultisample(bool multisample);
   void setMultisampleAvailable(bool available);
+  void setFastInteraction(bool fastInteraction);
 
 private:
     Ui::DisplayOptionsDialog *ui;

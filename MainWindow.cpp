@@ -200,6 +200,8 @@ MainWindow::MainWindow(QWidget *parent) :
             m_displayOptions, SLOT(setDepthMask(bool)));
     connect(m_viewer, SIGNAL(multisampleChanged(bool)),
             m_displayOptions, SLOT(setMultisample(bool)));
+    connect(m_viewer, SIGNAL(fastInteractionChanged(bool)),
+            m_displayOptions, SLOT(setFastInteraction(bool)));
 
 
     // Sync display options dialog to viewer
@@ -215,6 +217,8 @@ MainWindow::MainWindow(QWidget *parent) :
             m_viewer, SLOT(setDepthMasking(bool)));
     connect(m_displayOptions, SIGNAL(multiSampleChanged(bool)),
             m_viewer, SLOT(setMultisample(bool)));
+    connect(m_displayOptions, SIGNAL(fastInteractionChanged(bool)),
+            m_viewer, SLOT(setFastInteraction(bool)));
 
     m_displayOptions->setMultisampleAvailable(m_viewer->multisampleAvailable());
 
@@ -232,6 +236,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_viewer->setColorPoints(true);
     m_viewer->setDepthMasking(true);
     m_viewer->setMultisample(true);
+    m_viewer->setFastInteraction(false);
     m_viewer->setPointDensity(100);
 
     resize(800,600);

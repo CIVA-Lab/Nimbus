@@ -21,6 +21,8 @@ DisplayOptionsDialog::DisplayOptionsDialog(QWidget *parent) :
           this, SIGNAL(pointDepthChanged(bool)));
   connect(ui->multisampleCheckBox, SIGNAL(toggled(bool)),
           this, SIGNAL(multiSampleChanged(bool)));
+  connect(ui->fastInteractionCheckBox, SIGNAL(toggled(bool)),
+          this, SIGNAL(fastInteractionChanged(bool)));
 }
 
 DisplayOptionsDialog::~DisplayOptionsDialog()
@@ -76,4 +78,9 @@ void DisplayOptionsDialog::setMultisample(bool multisample)
 void DisplayOptionsDialog::setMultisampleAvailable(bool available)
 {
   ui->multisampleCheckBox->setEnabled(available);
+}
+
+void DisplayOptionsDialog::setFastInteraction(bool fastInteraction)
+{
+  ui->fastInteractionCheckBox->setChecked(fastInteraction);
 }

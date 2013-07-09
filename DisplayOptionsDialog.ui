@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>209</width>
-    <height>255</height>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -108,6 +108,13 @@
     <widget class="QCheckBox" name="multisampleCheckBox">
      <property name="text">
       <string>Multisampling</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="fastInteractionCheckBox">
+     <property name="text">
+      <string>Fast Interaction</string>
      </property>
     </widget>
    </item>

@@ -24,6 +24,8 @@ signals:
   void depthMaskingChanged(bool);
   void multisampleChanged(bool);
 
+  void fastInteractionChanged(bool);
+
   void error(QString);
 
 public slots:
@@ -36,11 +38,14 @@ public slots:
   void setDepthMasking(bool value);
   void setMultisample(bool value);
 
+  void setFastInteraction(bool value);
+
   void restoreView();
 
 protected:
   void init();
   void draw();
+  void fastDraw();
   void keyPressEvent(QKeyEvent *);
 
   bool bindToVertexBuffer(const QVector<float> &vertices);
@@ -62,6 +67,9 @@ private:
   bool m_colorPoints;
   bool m_depthMasking;
   bool m_multisample;
+  bool m_fastInteraction;
+
+  int m_fastInteractionMax;
 
 };
 

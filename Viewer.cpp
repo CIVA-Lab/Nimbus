@@ -19,7 +19,9 @@ Viewer::Viewer(QWidget *parent) :
   m_vertexCount(0),
   m_density(1.0),
   m_pointSize(1.0),
-  m_smoothPoints(true)
+  m_smoothPoints(true),
+  m_fastInteraction(false),
+  m_fastInteractionMax(250000)
 {
   setAutoFillBackground(false);
   setKeyDescription(Qt::Key_P, "Toggle Smooth Points");
@@ -212,6 +214,20 @@ void Viewer::setMultisample(bool value)
   }
 }
 
+void Viewer::setFastInteraction(bool value)
+{
+  if(m_fastInteraction != value)
+  {
+    m_fastInteraction = value;
+    if(m_fastInteraction)
+      displayMessage("Fast Interaction enabled");
+    else
+      displayMessage("Fast Interaction disabled");
+
+    emit fastInteractionChanged(m_fastInteraction);
+  }
+}
+
 void Viewer::restoreView()
 {
   // Restore default view by creating new camera and fitting scene
@@ -293,6 +309,59 @@ void Viewer::draw()
   glDisableClientState(GL_VERTEX_ARRAY);
 
   glDepthMask(GL_TRUE);
+}
+
+void Viewer::fastDraw()
+{
+  if(!m_fastInteraction)
+  {
+    draw();
+    return;
+  }
+
+  int pointsToDraw = qMin((int)(m_vertexCount * m_density/100.0),
+                          m_fastInteractionMax);
+
+//  qDebug() << "Fast draw points" << pointsToDraw;
+  glPointSize(m_pointSize);
+
+  if(!m_depthMasking)
+    glDepthMask(GL_FALSE);
+
+  if(m_multisample)
+    glEnable(GL_MULTISAMPLE);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  if(m_colorPoints)
+    glEnableClientState(GL_COLOR_ARRAY);
+
+  if(!m_colorBuffer.isCreated())
+  {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glColorPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+  } else {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+
+    m_colorBuffer.bind();
+//    glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
+    // Modified to use floats for color; testing effect on performance
+    glColorPointer(3, GL_FLOAT, 0, 0);
+    m_colorBuffer.release();
+  }
+
+//  glDrawArrays(GL_POINTS, 0, m_vertexCount * 25/100.0);
+  glDrawArrays(GL_POINTS, 0, pointsToDraw);
+
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+
+  glDepthMask(GL_TRUE);
+
 }
 
 bool Viewer::bindToVertexBuffer(const QVector<float> &vertices)
