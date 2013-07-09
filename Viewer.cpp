@@ -23,6 +23,7 @@ Viewer::Viewer(QWidget *parent) :
 {
   setAutoFillBackground(false);
   setKeyDescription(Qt::Key_P, "Toggle Smooth Points");
+  setKeyDescription(Qt::Key_R, "Restore default view");
   setShortcut(EXIT_VIEWER, 0);
 }
 
@@ -211,6 +212,13 @@ void Viewer::setMultisample(bool value)
   }
 }
 
+void Viewer::restoreView()
+{
+  // Restore default view by creating new camera and fitting scene
+  setCamera(new Camera());
+  showEntireScene();
+}
+
 void Viewer::init()
 {
 #ifdef DEBUG_GL_CAPABILITIES
@@ -352,6 +360,8 @@ void Viewer::keyPressEvent(QKeyEvent *e)
     toggleSmoothPoints(); break;
   case Qt::Key_Escape:
     if(isFullScreen()) setFullScreen(false); break;
+  case Qt::Key_R:
+    restoreView(); break;
   default:
     QGLViewer::keyPressEvent(e);
   }

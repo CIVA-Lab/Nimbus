@@ -36,6 +36,8 @@ public slots:
   void setDepthMasking(bool value);
   void setMultisample(bool value);
 
+  void restoreView();
+
 protected:
   void init();
   void draw();
@@ -59,6 +61,7 @@ private:
   bool m_colorPoints;
   bool m_depthMasking;
   bool m_multisample;
+
 };
 
 #endif // VIEWER_H
