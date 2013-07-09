@@ -45,6 +45,7 @@ protected:
 
   bool bindToVertexBuffer(const QVector<float> &vertices);
   bool loadColorsToBuffer(const QVector<unsigned char> &colors);
+  bool loadColorsToBuffer(const QVector<float> &colors);
 
 private:
   // Vertex buffer object for point cloud

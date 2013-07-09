@@ -26,8 +26,9 @@ public:
 
     // Return x,y,z interleaved vector of floats
     QVector<float> pointData() const;
-    // Return rgba interleaved values for color as unsigned bytes
+    // Return rgb interleaved values for color as unsigned bytes
     QVector<unsigned char> colorData() const;
+    QVector<float> colorDataF() const;
 
     // Shuffle point order in-place
     void shuffle();

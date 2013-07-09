@@ -85,6 +85,21 @@ QVector<unsigned char> PointCloud::colorData() const
   return result;
 }
 
+QVector<float> PointCloud::colorDataF() const
+{
+  QVector<float> result;
+
+  foreach(QColor c, m_colors)
+  {
+    result.push_back(c.redF());
+    result.push_back(c.greenF());
+    result.push_back(c.blueF());
+  }
+
+  return result;
+}
+
+
 void PointCloud::shuffle()
 {
   for(int i = m_points.count() - 1; i > 0; i--)

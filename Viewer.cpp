@@ -90,7 +90,7 @@ bool Viewer::setPointCloud(const PointCloud &cloud)
 
   if(cloud.hasColor())
   {
-    if(!loadColorsToBuffer(cloud.colorData()))
+    if(!loadColorsToBuffer(cloud.colorDataF()))
     {
       qDebug() << "Failed loading color data.";
       return false;
@@ -281,7 +281,9 @@ void Viewer::draw()
     m_vertexBuffer.release();
 
     m_colorBuffer.bind();
-    glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
+//    glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
+    // Modified to use floats for color; testing effect on performance
+    glColorPointer(3, GL_FLOAT, 0, 0);
     m_colorBuffer.release();
   }
 
@@ -348,6 +350,30 @@ bool Viewer::loadColorsToBuffer(const QVector<unsigned char> &colors)
 
   m_vertexBuffer.allocate(colors.constData(),
                           colors.count() * sizeof(unsigned char));
+
+  return glGetError() == GL_NO_ERROR;
+}
+
+bool Viewer::loadColorsToBuffer(const QVector<float> &colors)
+{
+  // Ensure RGB
+  if(colors.count() % 3)
+    return false;
+
+  // Make context current
+  makeCurrent();
+
+  if(m_colorBuffer.isCreated())
+    m_colorBuffer.destroy();
+
+  if(!m_colorBuffer.create())
+    return false;
+
+  if(!m_colorBuffer.bind())
+    return false;
+
+  m_vertexBuffer.allocate(colors.constData(),
+                          colors.count() * sizeof(float));
 
   return glGetError() == GL_NO_ERROR;
 }
