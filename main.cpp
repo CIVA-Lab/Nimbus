@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(Nimbus);
 
     QApplication a(argc, argv);
-#ifdef Q_WS_WIN
+#if defined(Q_WS_WIN) || defined(Q_WS_X11)
     // Set application wide icon; needed for static windows builds
     a.setWindowIcon(QIcon(":/Nimbus.ico"));
 #endif

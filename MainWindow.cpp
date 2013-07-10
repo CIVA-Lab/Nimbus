@@ -162,8 +162,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Get default OpenGL format
     QGLFormat format = QGLFormat::defaultFormat();
-    // Enable sync to VBLANK
+
+    // Optional sync to VBLANK; enabled by default
+#ifndef NO_VBLANK_SYNC
     format.setSwapInterval(1);
+#endif
+
     // Enable sample buffers
     format.setOption(QGL::SampleBuffers);
     // Request alpha buffer

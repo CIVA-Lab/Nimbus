@@ -29,14 +29,12 @@ RC_FILE = Nimbus.rc
 }
 
 unix:!macx {
-INCLUDEPATH += extern/QGLViewer/include
-LIBS += -Lextern/QGLViewer/lib -lQGLViewer
+DEFINES += NO_VBLANK_SYNC
+INCLUDEPATH += ../local/include
+LIBS += -L../local/lib -llas -llaszip -lboost_thread-mt -lQGLViewer
 }
 
 INCLUDEPATH += 3rdparty/rply
-# INCLUDEPATH += extern/laslib/include
-
-# LIBS += -Lextern/laslib/lib -llas
 
 SOURCES += main.cpp\
         MainWindow.cpp \
