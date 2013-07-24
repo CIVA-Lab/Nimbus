@@ -417,7 +417,7 @@ bool Viewer::loadColorsToBuffer(const QVector<unsigned char> &colors)
   if(!m_colorBuffer.bind())
     return false;
 
-  m_vertexBuffer.allocate(colors.constData(),
+  m_colorBuffer.allocate(colors.constData(),
                           colors.count() * sizeof(unsigned char));
 
   return glGetError() == GL_NO_ERROR;
@@ -441,7 +441,7 @@ bool Viewer::loadColorsToBuffer(const QVector<float> &colors)
   if(!m_colorBuffer.bind())
     return false;
 
-  m_vertexBuffer.allocate(colors.constData(),
+  m_colorBuffer.allocate(colors.constData(),
                           colors.count() * sizeof(float));
 
   return glGetError() == GL_NO_ERROR;
