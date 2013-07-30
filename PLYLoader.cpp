@@ -41,7 +41,7 @@ bool PLYLoader::canRead(const QString &path)
 bool PLYLoader::open(const QString &path)
 {
   // Try to open; pass this as user data
-  m_ply = ply_open(path.toLocal8Bit().constData(), NULL, 0, NULL);
+  m_ply = ply_open(path.toLocal8Bit().constData(), nullErrorCallback, 0, NULL);
   if(!m_ply) return false;
 
   // Try to read header
