@@ -3,6 +3,7 @@
 
 #include <QGLViewer/qglviewer.h>
 #include <QGLBuffer>
+#include <QPixmap>
 #include "PointCloud.h"
 
 class Viewer : public QGLViewer
@@ -45,6 +46,7 @@ public slots:
 protected:
   void init();
   void draw();
+  void postDraw();
   void fastDraw();
   void keyPressEvent(QKeyEvent *);
 
@@ -70,6 +72,10 @@ private:
   bool m_fastInteraction;
 
   int m_fastInteractionMax;
+
+  // Onscreen logo
+  QPixmap m_logoPixmap;
+  GLuint m_logoTextureId;
 
 };
 

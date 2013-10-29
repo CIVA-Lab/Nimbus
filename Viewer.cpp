@@ -27,6 +27,10 @@ Viewer::Viewer(QWidget *parent) :
   setKeyDescription(Qt::Key_P, "Toggle Smooth Points");
   setKeyDescription(Qt::Key_R, "Restore default view");
   setShortcut(EXIT_VIEWER, 0);
+
+  // Load logo pixmap
+  m_logoPixmap = QPixmap(":/Logo");
+
 }
 
 bool Viewer::setPointModel(const QVector<float> &points)
@@ -268,6 +272,8 @@ void Viewer::init()
 
   glDisable(GL_LIGHTING);
 
+  // Bind logo to texture
+  m_logoTextureId = bindTexture(m_logoPixmap);
 }
 
 void Viewer::draw()
@@ -309,6 +315,32 @@ void Viewer::draw()
   glDisableClientState(GL_VERTEX_ARRAY);
 
   glDepthMask(GL_TRUE);
+}
+
+void Viewer::postDraw()
+{
+  // Call base class post draw
+  QGLViewer::postDraw();
+
+  // Save OpenGL state
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+  // Set matrices for screen drawing
+  startScreenCoordinatesSystem();
+
+  // Alpha blending needed for transparency
+  glEnable(GL_BLEND);
+
+  // Draw texture in lower right
+  drawTexture(QPointF(width() - m_logoPixmap.width(),
+                      height() - m_logoPixmap.height()),
+                      m_logoTextureId);
+
+  // Revert matrices
+  stopScreenCoordinatesSystem();
+
+  // Restore OpenGL state
+  glPopAttrib();
 }
 
 void Viewer::fastDraw()
