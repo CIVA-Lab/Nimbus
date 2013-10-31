@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include "PointCloud.h"
 
+using namespace qglviewer;
 class Viewer : public QGLViewer
 {
     Q_OBJECT
@@ -43,6 +44,11 @@ public slots:
 
   void restoreView();
 
+  void toggleTurntable();
+  void increaseTurntableSpeed();
+  void decreaseTurntableSpeed();
+
+  void updateSpin();
 protected:
   void init();
   void draw();
@@ -55,6 +61,8 @@ protected:
   bool loadColorsToBuffer(const QVector<float> &colors);
 
 private:
+  QString speedToString();
+
   // Vertex buffer object for point cloud
   QGLBuffer m_vertexBuffer;
   QGLBuffer m_colorBuffer;
@@ -77,6 +85,8 @@ private:
   QPixmap m_logoPixmap;
   GLuint m_logoTextureId;
 
+  // Turntable speed
+  double m_turntableRPM;
 };
 
 #endif // VIEWER_H

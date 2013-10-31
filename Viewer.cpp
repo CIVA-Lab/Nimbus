@@ -6,6 +6,8 @@
 #include <QGLShaderProgram>
 #include <QGLShader>
 #include <QKeyEvent>
+// For pi constant
+#include <cmath>
 
 using namespace qglviewer;
 
@@ -21,16 +23,22 @@ Viewer::Viewer(QWidget *parent) :
   m_pointSize(1.0),
   m_smoothPoints(true),
   m_fastInteraction(false),
-  m_fastInteractionMax(250000)
+  m_fastInteractionMax(250000),
+  m_turntableRPM(1.0)
 {
   setAutoFillBackground(false);
   setKeyDescription(Qt::Key_P, "Toggle Smooth Points");
   setKeyDescription(Qt::Key_R, "Restore default view");
+  setKeyDescription(Qt::Key_T, "Toggle turntable animation");
+  setKeyDescription(Qt::Key_Minus, "Decrease turntable speed");
+  setKeyDescription(Qt::Key_Plus, "Increase turntable speed");
   setShortcut(EXIT_VIEWER, 0);
 
   // Load logo pixmap
   m_logoPixmap = QPixmap(":/Logo");
 
+  // Install manipulated frame
+  setManipulatedFrame(new ManipulatedFrame());
 }
 
 bool Viewer::setPointModel(const QVector<float> &points)
@@ -278,6 +286,10 @@ void Viewer::init()
 
 void Viewer::draw()
 {
+  // Apply turntable frame
+  glPushMatrix();
+  glMultMatrixd(manipulatedFrame()->matrix());
+
   glPointSize(m_pointSize);
 
   if(!m_depthMasking)
@@ -315,6 +327,9 @@ void Viewer::draw()
   glDisableClientState(GL_VERTEX_ARRAY);
 
   glDepthMask(GL_TRUE);
+
+  // Restore transforms
+  glPopMatrix();
 }
 
 void Viewer::postDraw()
@@ -489,7 +504,67 @@ void Viewer::keyPressEvent(QKeyEvent *e)
     if(isFullScreen()) setFullScreen(false); break;
   case Qt::Key_R:
     restoreView(); break;
+  case Qt::Key_T:
+    toggleTurntable(); break;
+  case Qt::Key_Plus:
+  case Qt::Key_Equal:
+    increaseTurntableSpeed(); break;
+  case Qt::Key_Minus:
+    decreaseTurntableSpeed(); break;
   default:
     QGLViewer::keyPressEvent(e);
   }
+}
+
+void Viewer::toggleTurntable()
+{
+  if(manipulatedFrame()->isSpinning())
+  {
+    manipulatedFrame()->stopSpinning();
+    ManipulatedFrame *oldFrame = manipulatedFrame();
+    setManipulatedFrame(new ManipulatedFrame());
+    delete oldFrame;
+    disconnect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
+    update();
+    displayMessage("Turntable off");
+  } else {
+    manipulatedFrame()->setSpinningQuaternion(Quaternion(Vec(0,0,0), 0.0));
+    manipulatedFrame()->startSpinning(1000.0/30.0);
+    connect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
+    displayMessage("Turntable on");
+  }
+}
+
+void Viewer::increaseTurntableSpeed()
+{
+  m_turntableRPM *= 2.0;
+  displayMessage("Turntable " + speedToString());
+}
+
+void Viewer::decreaseTurntableSpeed()
+{
+  m_turntableRPM /= 2.0;
+  displayMessage("Turntable " + speedToString());
+}
+
+void Viewer::updateSpin()
+{
+
+  manipulatedFrame()->rotateAroundPoint(Quaternion(Vec(0,0,1),
+                                        (M_PI * 2.0 * m_turntableRPM)/(30.0 * 60)),
+                                        camera()->frame()->revolveAroundPoint());
+}
+
+QString Viewer::speedToString()
+{
+  QString result;
+  if(m_turntableRPM < 1.0)
+  {
+    // Convert to fraction
+    result = QString("1/%1x").arg((int)(1.0/m_turntableRPM));
+  } else {
+    result = QString("%1x").arg((int)m_turntableRPM);
+  }
+
+  return result;
 }
