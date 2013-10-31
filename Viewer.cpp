@@ -27,7 +27,7 @@ Viewer::Viewer(QWidget *parent) :
   m_turntableRPM(1.0)
 {
   setAutoFillBackground(false);
-  setKeyDescription(Qt::Key_P, "Toggle Smooth Points");
+  setKeyDescription(Qt::Key_P, "Toggle smooth points");
   setKeyDescription(Qt::Key_R, "Restore default view");
   setKeyDescription(Qt::Key_T, "Toggle turntable animation");
   setKeyDescription(Qt::Key_Minus, "Decrease turntable speed");
