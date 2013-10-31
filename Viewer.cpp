@@ -528,7 +528,19 @@ void Viewer::toggleTurntable()
     update();
     displayMessage("Turntable off");
   } else {
-    manipulatedFrame()->setSpinningQuaternion(Quaternion(Vec(0,0,0), 0.0));
+    // Choose up axis
+    int whichAxis = 0;
+    Vec up = camera()->upVector();
+    for(int i = 1; i < 3; ++i)
+    {
+      if(qAbs(up[i]) > qAbs(up[whichAxis]))
+         whichAxis = i;
+    }
+    m_turntableUp.setValue(0,0,0);
+    m_turntableUp[whichAxis] = 1.0;
+
+    // Create quaternion; rotation provided in updateSpin()
+    manipulatedFrame()->setSpinningQuaternion(Quaternion(m_turntableUp, 0.0));
     manipulatedFrame()->startSpinning(1000.0/30.0);
     connect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
     displayMessage("Turntable on");
@@ -550,7 +562,7 @@ void Viewer::decreaseTurntableSpeed()
 void Viewer::updateSpin()
 {
 
-  manipulatedFrame()->rotateAroundPoint(Quaternion(Vec(0,0,1),
+  manipulatedFrame()->rotateAroundPoint(Quaternion(m_turntableUp,
                                         (M_PI * 2.0 * m_turntableRPM)/(30.0 * 60)),
                                         camera()->frame()->revolveAroundPoint());
 }

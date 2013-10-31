@@ -87,6 +87,7 @@ private:
 
   // Turntable speed
   double m_turntableRPM;
+  Vec m_turntableUp;
 };
 
 #endif // VIEWER_H
