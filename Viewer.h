@@ -45,6 +45,7 @@ public slots:
   void restoreView();
 
   void toggleTurntable();
+  void resetTurntable();
   void increaseTurntableSpeed();
   void decreaseTurntableSpeed();
 
@@ -92,6 +93,7 @@ private:
   // Turntable speed
   double m_turntableRPM;
   Vec m_turntableUp;
+  bool m_turntableStarted;
 };
 
 #endif // VIEWER_H

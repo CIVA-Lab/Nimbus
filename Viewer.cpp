@@ -25,12 +25,14 @@ Viewer::Viewer(QWidget *parent) :
   m_fastInteraction(false),
   m_fastInteractionMax(250000),
   m_showLogo(true),
-  m_turntableRPM(1.0)
+  m_turntableRPM(1.0),
+  m_turntableStarted(false)
 {
   setAutoFillBackground(false);
   setKeyDescription(Qt::Key_P, "Toggle smooth points");
   setKeyDescription(Qt::Key_R, "Restore default view");
   setKeyDescription(Qt::Key_T, "Toggle turntable animation");
+  setKeyDescription(Qt::Key_T + Qt::SHIFT, "Reset turntable");
   setKeyDescription(Qt::Key_Minus, "Decrease turntable speed");
   setKeyDescription(Qt::Key_Plus, "Increase turntable speed");
   setShortcut(EXIT_VIEWER, 0);
@@ -510,7 +512,13 @@ void Viewer::keyPressEvent(QKeyEvent *e)
   case Qt::Key_R:
     restoreView(); break;
   case Qt::Key_T:
-    toggleTurntable(); break;
+    // 't' key
+    if(e->modifiers() == Qt::NoModifier)
+      toggleTurntable();
+    // Shift-T
+    else if(e->modifiers() == Qt::ShiftModifier)
+      resetTurntable();
+    break;
   case Qt::Key_Plus:
   case Qt::Key_Equal:
     increaseTurntableSpeed(); break;
@@ -530,31 +538,52 @@ void Viewer::toggleTurntable()
 {
   if(manipulatedFrame()->isSpinning())
   {
+    // Just pause turntable
     manipulatedFrame()->stopSpinning();
-    ManipulatedFrame *oldFrame = manipulatedFrame();
-    setManipulatedFrame(new ManipulatedFrame());
-    delete oldFrame;
-    disconnect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
     update();
-    displayMessage("Turntable off");
+    displayMessage("Turntable paused");
   } else {
-    // Choose up axis
-    int whichAxis = 0;
-    Vec up = camera()->upVector();
-    for(int i = 1; i < 3; ++i)
+    // If turntable not initialized, start
+    if(!m_turntableStarted)
     {
-      if(qAbs(up[i]) > qAbs(up[whichAxis]))
-         whichAxis = i;
-    }
-    m_turntableUp.setValue(0,0,0);
-    m_turntableUp[whichAxis] = 1.0;
+      // Choose up axis
+      int whichAxis = 0;
+      Vec up = camera()->upVector();
+      for(int i = 1; i < 3; ++i)
+      {
+        if(qAbs(up[i]) > qAbs(up[whichAxis]))
+          whichAxis = i;
+      }
+      m_turntableUp.setValue(0,0,0);
+      m_turntableUp[whichAxis] = 1.0;
 
-    // Create quaternion; rotation provided in updateSpin()
-    manipulatedFrame()->setSpinningQuaternion(Quaternion(m_turntableUp, 0.0));
+      // Create quaternion; rotation provided in updateSpin()
+      manipulatedFrame()->setSpinningQuaternion(Quaternion(m_turntableUp, 0.0));
+      manipulatedFrame()->startSpinning(1000.0/30.0);
+      connect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
+      m_turntableStarted = true;
+    }
+    // Start turntable moving
     manipulatedFrame()->startSpinning(1000.0/30.0);
-    connect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
-    displayMessage("Turntable on");
+
+    displayMessage("Turntable playing");
   }
+}
+
+void Viewer::resetTurntable()
+{
+  // Get old frame
+  ManipulatedFrame* old = manipulatedFrame();
+  // Set new frame
+  setManipulatedFrame(new ManipulatedFrame());
+  // delete old frame
+  delete old;
+  // Disconnect spin updates
+  disconnect(manipulatedFrame(), SIGNAL(spun()), this, SLOT(updateSpin()));
+
+  m_turntableStarted = false;
+
+  displayMessage("Turntable reset");
 }
 
 void Viewer::increaseTurntableSpeed()
