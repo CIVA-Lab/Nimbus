@@ -49,6 +49,9 @@ public slots:
   void decreaseTurntableSpeed();
 
   void updateSpin();
+
+  void toggleLogo();
+
 protected:
   void init();
   void draw();
@@ -84,6 +87,7 @@ private:
   // Onscreen logo
   QPixmap m_logoPixmap;
   GLuint m_logoTextureId;
+  bool m_showLogo;
 
   // Turntable speed
   double m_turntableRPM;

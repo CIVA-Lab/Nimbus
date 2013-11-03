@@ -24,6 +24,7 @@ Viewer::Viewer(QWidget *parent) :
   m_smoothPoints(true),
   m_fastInteraction(false),
   m_fastInteractionMax(250000),
+  m_showLogo(true),
   m_turntableRPM(1.0)
 {
   setAutoFillBackground(false);
@@ -337,25 +338,29 @@ void Viewer::postDraw()
   // Call base class post draw
   QGLViewer::postDraw();
 
-  // Save OpenGL state
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  // Allow logo to be disabled
+  if(m_showLogo)
+  {
+    // Save OpenGL state
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-  // Set matrices for screen drawing
-  startScreenCoordinatesSystem();
+    // Set matrices for screen drawing
+    startScreenCoordinatesSystem();
 
-  // Alpha blending needed for transparency
-  glEnable(GL_BLEND);
+    // Alpha blending needed for transparency
+    glEnable(GL_BLEND);
 
-  // Draw texture in lower right
-  drawTexture(QPointF(width() - m_logoPixmap.width(),
-                      height() - m_logoPixmap.height()),
-                      m_logoTextureId);
+    // Draw texture in lower right
+    drawTexture(QPointF(width() - m_logoPixmap.width(),
+                        height() - m_logoPixmap.height()),
+                m_logoTextureId);
 
-  // Revert matrices
-  stopScreenCoordinatesSystem();
+    // Revert matrices
+    stopScreenCoordinatesSystem();
 
-  // Restore OpenGL state
-  glPopAttrib();
+    // Restore OpenGL state
+    glPopAttrib();
+  }
 }
 
 void Viewer::fastDraw()
@@ -511,6 +516,11 @@ void Viewer::keyPressEvent(QKeyEvent *e)
     increaseTurntableSpeed(); break;
   case Qt::Key_Minus:
     decreaseTurntableSpeed(); break;
+  case Qt::Key_At:
+    // Alt-@
+    if(e->modifiers() == (Qt::AltModifier | Qt::ShiftModifier))
+      toggleLogo();
+    break;
   default:
     QGLViewer::keyPressEvent(e);
   }
@@ -565,6 +575,12 @@ void Viewer::updateSpin()
   manipulatedFrame()->rotateAroundPoint(Quaternion(m_turntableUp,
                                         (M_PI * 2.0 * m_turntableRPM)/(30.0 * 60)),
                                         camera()->frame()->revolveAroundPoint());
+}
+
+void Viewer::toggleLogo()
+{
+  m_showLogo = !m_showLogo;
+  update();
 }
 
 QString Viewer::speedToString()
