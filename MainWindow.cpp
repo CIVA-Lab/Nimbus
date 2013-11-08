@@ -15,6 +15,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <QtCore/qmath.h>
+
 #include "rply.h"
 
 #include "PointCloud.h"
@@ -316,6 +318,39 @@ void MainWindow::openFile(const QString &path)
       cloud.shuffle();
       m_viewer->setPointCloud(cloud);
 
+      // Load cameras
+      for(int i = 0; i < loader.cameraPositions().count(); i += 3)
+      {
+        Vec position(loader.cameraPositions().at(i + 0),
+                     loader.cameraPositions().at(i + 1),
+                     loader.cameraPositions().at(i +2));
+
+        m_viewer->camera()->setPosition(position);
+
+        Vec up(loader.cameraUpVectors().at(i + 0),
+               loader.cameraUpVectors().at(i + 1),
+               loader.cameraUpVectors().at(i + 2));
+
+        m_viewer->camera()->setUpVector(up);
+
+        Vec aim(loader.cameraAimVectors().at(i + 0),
+                loader.cameraAimVectors().at(i + 1),
+                loader.cameraAimVectors().at(i + 2));
+        m_viewer->camera()->setViewDirection(aim);
+
+        Vec aspect(loader.cameraAspectRatios().at(i + 0),
+                   loader.cameraAspectRatios().at(i + 1),
+                   loader.cameraAspectRatios().at(i + 2));
+
+        m_viewer->camera()->setFieldOfView(2 * qAtan((0.5 * aspect.y)/aspect.z));
+
+        m_viewer->camera()->addKeyFrameToPath(1);
+      }
+
+      connect(m_viewer->camera()->keyFrameInterpolator(1),
+              SIGNAL(interpolated()), m_viewer, SLOT(updateGL()));
+
+      m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
       progress.close();
 
       return;

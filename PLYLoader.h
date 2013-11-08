@@ -20,6 +20,11 @@ public:
 
   PointCloud load();
 
+  const QVector<double>& cameraPositions() const { return m_cameraPositions; }
+  const QVector<double>& cameraUpVectors() const { return m_cameraUps; }
+  const QVector<double>& cameraAimVectors() const { return m_cameraAims; }
+  const QVector<double>& cameraAspectRatios() const { return m_cameraAspects; }
+
 signals:
   void progress(int percent);
 
