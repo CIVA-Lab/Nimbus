@@ -30,6 +30,10 @@ private:
   static void nullErrorCallback(p_ply, const char *);
   static int vertexCallback(p_ply_argument arg);
   static int colorCallback(p_ply_argument arg);
+  static int cameraPositionCallback(p_ply_argument arg);
+  static int cameraUpCallback(p_ply_argument arg);
+  static int cameraAimCallback(p_ply_argument arg);
+  static int cameraAspectCallback(p_ply_argument arg);
 
   void emitProgress();
 
@@ -39,6 +43,11 @@ private:
 
   QVector<double> m_points;
   QVector<double> m_colors;
+
+  QVector<double> m_cameraPositions;
+  QVector<double> m_cameraUps;
+  QVector<double> m_cameraAims;
+  QVector<double> m_cameraAspects;
 
   bool m_cancelLoad;
 };

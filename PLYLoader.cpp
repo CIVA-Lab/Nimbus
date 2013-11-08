@@ -66,6 +66,23 @@ bool PLYLoader::open(const QString &path)
   if(alphaCount > 0)
     qWarning() << "Ignoring vertex alpha";
 
+  // Load cameras
+  ply_set_read_cb(m_ply, "camera", "x", cameraPositionCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "y", cameraPositionCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "z", cameraPositionCallback, this, 0);
+
+  ply_set_read_cb(m_ply, "camera", "ux", cameraUpCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "uy", cameraUpCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "uz", cameraUpCallback, this, 0);
+
+  ply_set_read_cb(m_ply, "camera", "dx", cameraAimCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "dy", cameraAimCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "dz", cameraAimCallback, this, 0);
+
+  ply_set_read_cb(m_ply, "camera", "arx", cameraAspectCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "ary", cameraAspectCallback, this, 0);
+  ply_set_read_cb(m_ply, "camera", "arz", cameraAspectCallback, this, 0);
+
   // Open is only successful if there are vertices to read
   return m_pointCount > 0;
 }
@@ -155,6 +172,63 @@ int PLYLoader::colorCallback(p_ply_argument arg)
   return 1;
 
 }
+
+int PLYLoader::cameraPositionCallback(p_ply_argument arg)
+{
+  // Get pointer to loader object
+  PLYLoader *loader;
+  ply_get_argument_user_data(arg, (void **)&loader, NULL);
+
+  loader->m_cameraPositions.push_back(ply_get_argument_value(arg));
+
+  // See if load has been canceled
+  if(loader->m_cancelLoad) return 0;
+
+  return 1;
+}
+
+int PLYLoader::cameraUpCallback(p_ply_argument arg)
+{
+  // Get pointer to loader object
+  PLYLoader *loader;
+  ply_get_argument_user_data(arg, (void **)&loader, NULL);
+
+  loader->m_cameraUps.push_back(ply_get_argument_value(arg));
+
+  // See if load has been canceled
+  if(loader->m_cancelLoad) return 0;
+
+  return 1;
+}
+
+int PLYLoader::cameraAimCallback(p_ply_argument arg)
+{
+  // Get pointer to loader object
+  PLYLoader *loader;
+  ply_get_argument_user_data(arg, (void **)&loader, NULL);
+
+  loader->m_cameraAims.push_back(ply_get_argument_value(arg));
+
+  // See if load has been canceled
+  if(loader->m_cancelLoad) return 0;
+
+  return 1;
+}
+
+int PLYLoader::cameraAspectCallback(p_ply_argument arg)
+{
+  // Get pointer to loader object
+  PLYLoader *loader;
+  ply_get_argument_user_data(arg, (void **)&loader, NULL);
+
+  loader->m_cameraAspects.push_back(ply_get_argument_value(arg));
+
+  // See if load has been canceled
+  if(loader->m_cancelLoad) return 0;
+
+  return 1;
+}
+
 
 void PLYLoader::emitProgress()
 {
