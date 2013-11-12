@@ -18,6 +18,8 @@ public:
 
   bool multisampleAvailable();
 
+  QVector<float> m_fov;
+
 signals:
   void pointSizeChanged(int pointSize);
   void pointDensityChanged(int pointDensity);
@@ -52,6 +54,8 @@ public slots:
   void updateSpin();
 
   void toggleLogo();
+
+  void savePathMovie();
 
 protected:
   void init();
@@ -94,6 +98,7 @@ private:
   double m_turntableRPM;
   Vec m_turntableUp;
   bool m_turntableStarted;
+
 };
 
 #endif // VIEWER_H

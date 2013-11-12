@@ -188,6 +188,8 @@ MainWindow::MainWindow(QWidget *parent) :
                         SLOT(show()));
     connect(m_createOptions, SIGNAL(accepted(QString,int,bool)),
             SLOT(createPointCloud(QString,int,bool)));
+
+    fileMenu->addAction("Save Path Movie", m_viewer, SLOT(savePathMovie()));
     fileMenu->addAction("Quit", qApp, SLOT(quit()));
 
     m_displayOptions = new DisplayOptionsDialog(this);
@@ -245,7 +247,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_viewer->setFastInteraction(false);
     m_viewer->setPointDensity(100);
 
-    resize(800,600);
+    resize(825,550);
 
     setAcceptDrops(true);
 }
@@ -344,6 +346,7 @@ void MainWindow::openFile(const QString &path)
 
         m_viewer->camera()->setFieldOfView(2 * qAtan((0.5 * aspect.y)/aspect.z));
 
+        m_viewer->m_fov.push_back(2 * qAtan((0.5 * aspect.y)/aspect.z));
         m_viewer->camera()->addKeyFrameToPath(1);
       }
 

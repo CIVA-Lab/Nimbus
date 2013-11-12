@@ -285,6 +285,8 @@ void Viewer::init()
 
   // Bind logo to texture
   m_logoTextureId = bindTexture(m_logoPixmap);
+
+  qglClearColor(QColor(51,51,51,185));
 }
 
 void Viewer::draw()
@@ -610,6 +612,25 @@ void Viewer::toggleLogo()
 {
   m_showLogo = !m_showLogo;
   update();
+}
+
+void Viewer::savePathMovie()
+{
+  setSnapshotFormat("PNG");
+  setSnapshotFileName("Snap");
+
+  connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+
+  // Loop over camera positions
+  KeyFrameInterpolator *kfi = camera()->keyFrameInterpolator(1);
+
+  for(int i = 0; i < kfi->numberOfKeyFrames(); ++i)
+  {
+    camera()->setFieldOfView(m_fov.at(i));
+    kfi->interpolateAtTime(kfi->keyFrameTime(i));
+  }
+  disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+
 }
 
 QString Viewer::speedToString()
