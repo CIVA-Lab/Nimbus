@@ -17,6 +17,8 @@
 
 #include <QtCore/qmath.h>
 
+#include <QMimeData>
+
 #include "rply.h"
 
 #include "PointCloud.h"

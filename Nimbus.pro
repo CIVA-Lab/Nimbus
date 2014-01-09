@@ -11,6 +11,8 @@ TEMPLATE = app
 ICON = Nimbus.icns
 
 macx {
+QMAKE_CXXFLAGS += -F/Library/Frameworks
+QMAKE_LFLAGS += -F/Library/Frameworks -framework QGLViewer
 LIBS *= -framework QGLViewer
 
 INCLUDEPATH *= extern/macx/include
