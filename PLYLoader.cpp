@@ -5,7 +5,7 @@
 #include <QDebug>
 
 PLYLoader::PLYLoader(QObject *parent) :
-  QObject(parent), m_ply(false), m_pointCount(0), m_cancelLoad(false)
+  QObject(parent), m_ply(NULL), m_pointCount(0), m_cancelLoad(false)
 {
 }
 
