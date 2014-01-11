@@ -180,6 +180,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QGLFormat::setDefaultFormat(format);
 
     m_viewer = new Viewer();
+
+    // Show viewer before adding to main window;  supressed "Invalid Drawable"
+    // error on OS X
+    m_viewer->show();
+
     setCentralWidget(m_viewer);
 
     m_createOptions = new CreatePointCloudDialog(this);
