@@ -196,7 +196,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_createOptions, SIGNAL(accepted(QString,int,bool)),
             SLOT(createPointCloud(QString,int,bool)));
 
-    fileMenu->addAction("Save Path Movie", m_viewer, SLOT(savePathMovie()));
+    // Hide option to export movie from flight path; Not ready for other users
+    // fileMenu->addAction("Save Path Movie", m_viewer, SLOT(savePathMovie()));
+
     fileMenu->addAction("Quit", qApp, SLOT(quit()));
 
     m_displayOptions = new DisplayOptionsDialog(this);
