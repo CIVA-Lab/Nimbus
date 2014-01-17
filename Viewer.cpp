@@ -531,6 +531,10 @@ void Viewer::keyPressEvent(QKeyEvent *e)
     if(e->modifiers() == (Qt::AltModifier | Qt::ShiftModifier))
       toggleLogo();
     break;
+  // For Qt 5 on OS X, Alt-@ returns the euro symbol (€) 0x20AC
+  case 0x20AC:
+    toggleLogo();
+    break;
   default:
     QGLViewer::keyPressEvent(e);
   }
