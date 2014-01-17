@@ -357,10 +357,16 @@ void MainWindow::openFile(const QString &path)
         m_viewer->camera()->addKeyFrameToPath(1);
       }
 
-      connect(m_viewer->camera()->keyFrameInterpolator(1),
-              SIGNAL(interpolated()), m_viewer, SLOT(updateGL()));
+      // Check that keyframes have been added to path 1
+      if(m_viewer->camera()->keyFrameInterpolator(1) != NULL)
+      {
+        // Bug here; signal source is NULL
+        connect(m_viewer->camera()->keyFrameInterpolator(1),
+                SIGNAL(interpolated()), m_viewer, SLOT(updateGL()));
 
-      m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
+        // Bug here; Seems KeyFrameInterpolator(1) is NULL
+        m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
+      }
       progress.close();
 
       return;
