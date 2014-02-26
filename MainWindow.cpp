@@ -334,7 +334,7 @@ void MainWindow::openFile(const QString &path)
       {
         Vec position(loader.cameraPositions().at(i + 0),
                      loader.cameraPositions().at(i + 1),
-                     loader.cameraPositions().at(i +2));
+                     loader.cameraPositions().at(i + 2));
 
         m_viewer->camera()->setPosition(position);
 
@@ -362,11 +362,9 @@ void MainWindow::openFile(const QString &path)
       // Check that keyframes have been added to path 1
       if(m_viewer->camera()->keyFrameInterpolator(1) != NULL)
       {
-        // Bug here; signal source is NULL
         connect(m_viewer->camera()->keyFrameInterpolator(1),
                 SIGNAL(interpolated()), m_viewer, SLOT(updateGL()));
 
-        // Bug here; Seems KeyFrameInterpolator(1) is NULL
         m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
       }
       progress.close();
