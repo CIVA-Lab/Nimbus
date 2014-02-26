@@ -44,62 +44,6 @@ Viewer::Viewer(QWidget *parent) :
   setManipulatedFrame(new ManipulatedFrame());
 }
 
-bool Viewer::setPointModel(const QVector<float> &points)
-{
-  // Make sure vector is not empty
-  if(points.isEmpty())
-    return false;
-
-  // Bind points to VBO
-  if(!bindToVertexBuffer(points))
-    return false;
-
-  if(m_colorBuffer.isCreated())
-    m_colorBuffer.destroy();
-
-  // Find min/max extents
-  float minX, maxX;
-  float minY, maxY;
-  float minZ, maxZ;
-
-  minX = maxX = points.at(0);
-  minY = maxY = points.at(1);
-  minZ = maxZ = points.at(2);
-
-  for(int i = 3; i < points.count(); i += 3)
-  {
-    float x = points.at(i + 0);
-    if(x < minX)
-      minX = x;
-    else if(x > maxX)
-      maxX = x;
-
-    float y = points.at(i + 1);
-    if(y < minY)
-      minY = y;
-    else if(y > maxY)
-      maxY = y;
-
-    float z = points.at(i + 2);
-    if(z < minZ)
-      minZ = z;
-    else if(z > maxZ)
-      maxZ = z;
-  }
-
-  // Set scene's bounding box
-  setSceneBoundingBox(qglviewer::Vec(minX, minY, minZ),
-                      qglviewer::Vec(maxX, maxY, maxZ));
-
-  // Update camera
-  showEntireScene();
-
-  // Restore point density to 100%; will also trigger point count display
-  setPointDensity(100);
-
-  return true;
-}
-
 bool Viewer::setPointCloud(const PointCloud &cloud)
 {
   if(!bindToVertexBuffer(cloud.pointData()))
@@ -320,8 +264,6 @@ void Viewer::draw()
     m_vertexBuffer.release();
 
     m_colorBuffer.bind();
-//    glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
-    // Modified to use floats for color; testing effect on performance
     glColorPointer(3, GL_FLOAT, 0, 0);
     m_colorBuffer.release();
   }
@@ -451,30 +393,6 @@ bool Viewer::bindToVertexBuffer(const QVector<float> &vertices)
                           vertices.count() * sizeof(float));
 
   m_vertexCount = vertices.count()/3;
-
-  return glGetError() == GL_NO_ERROR;
-}
-
-bool Viewer::loadColorsToBuffer(const QVector<unsigned char> &colors)
-{
-  // Ensure RGB
-  if(colors.count() % 3)
-    return false;
-
-  // Make context current
-  makeCurrent();
-
-  if(m_colorBuffer.isCreated())
-    m_colorBuffer.destroy();
-
-  if(!m_colorBuffer.create())
-    return false;
-
-  if(!m_colorBuffer.bind())
-    return false;
-
-  m_colorBuffer.allocate(colors.constData(),
-                          colors.count() * sizeof(unsigned char));
 
   return glGetError() == GL_NO_ERROR;
 }

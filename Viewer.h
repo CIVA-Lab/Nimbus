@@ -13,7 +13,6 @@ class Viewer : public QGLViewer
 public:
   explicit Viewer(QWidget *parent = 0);
 
-  bool setPointModel(const QVector<float> &points);
   bool setPointCloud(const PointCloud& cloud);
 
   bool multisampleAvailable();
@@ -65,7 +64,6 @@ protected:
   void keyPressEvent(QKeyEvent *);
 
   bool bindToVertexBuffer(const QVector<float> &vertices);
-  bool loadColorsToBuffer(const QVector<unsigned char> &colors);
   bool loadColorsToBuffer(const QVector<float> &colors);
 
 private:
