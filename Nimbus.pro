@@ -11,14 +11,8 @@ TEMPLATE = app
 ICON = Nimbus.icns
 
 macx {
-#QMAKE_CXXFLAGS += -F/Library/Frameworks
-#QMAKE_LFLAGS += -F/Library/Frameworks -framework QGLViewer
-#LIBS *= -framework QGLViewer
-
 INCLUDEPATH *= extern/macx/include
-LIBS *= -Lextern/macx/lib -llas -llaszip -lQGLViewer -L/opt/local/lib -lboost_thread-mt
-
-INCLUDEPATH *= /opt/local/include
+LIBS *= -Lextern/macx/lib -lQGLViewer
 }
 
 win32 {
@@ -45,8 +39,7 @@ SOURCES += main.cpp\
     CreatePointCloudDialog.cpp \
     3rdparty/rply/rply.c \
     PointCloud.cpp \
-    PLYLoader.cpp \
-    LASLoader.cpp
+    PLYLoader.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
@@ -54,8 +47,7 @@ HEADERS  += MainWindow.h \
     CreatePointCloudDialog.h \
     3rdparty/rply/rply.h \
     PointCloud.h \
-    PLYLoader.h \
-    LASLoader.h
+    PLYLoader.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
