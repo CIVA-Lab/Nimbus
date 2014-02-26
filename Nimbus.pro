@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     CreatePointCloudDialog.cpp \
     3rdparty/rply/rply.c \
     PointCloud.cpp \
-    PLYLoader.cpp
+    PLYLoader.cpp \
+    PointGenerator.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
@@ -47,7 +48,8 @@ HEADERS  += MainWindow.h \
     CreatePointCloudDialog.h \
     3rdparty/rply/rply.h \
     PointCloud.h \
-    PLYLoader.h
+    PLYLoader.h \
+    PointGenerator.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \

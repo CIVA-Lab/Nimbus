@@ -23,139 +23,7 @@
 
 #include "PointCloud.h"
 #include "PLYLoader.h"
-
-class Sphere
-{
-public:
-  Sphere(double radius = 0.5) : m_radiusSquared(radius*radius) { }
-  double operator()(double x, double y, double z)
-  {
-    return x*x + y*y + z*z - m_radiusSquared;
-  }
-private:
-  double m_radiusSquared;
-};
-
-class Cylinder
-{
-public:
-  Cylinder(double radius = 0.5) : m_radiusSquared(radius*radius) { }
-  double operator()(double x, double y, double z)
-  {
-    Q_UNUSED(z)
-    return x*x + y*y - m_radiusSquared;
-  }
-private:
-  double m_radiusSquared;
-};
-
-class Cube
-{
-public:
-  Cube(double width = 1.0) : m_halfWidth(width/2.0) { }
-  double operator()(double x, double y, double z)
-  {
-    return qMax(qMax(qAbs(x), qAbs(y)), qAbs(z)) - m_halfWidth;
-  }
-private:
-  double m_halfWidth;
-};
-
-class Torus
-{
-public:
-  Torus(double radius = 0.3, double height = 0.2) :
-    m_majorRadius(radius),
-    m_majorRadiusSquared(m_majorRadius*m_majorRadius),
-    m_minorRadiusSquared(height*height) { }
-  double operator()(double x, double y, double z)
-  {
-    return (x*x + y*y + z*z + m_majorRadiusSquared - m_minorRadiusSquared)
-        * (x*x + y*y + z*z + m_majorRadiusSquared - m_minorRadiusSquared)
-        - 4 * m_majorRadiusSquared * (x*x + y*y);
-  }
-
-private:
-  double m_majorRadius;
-  double m_majorRadiusSquared;
-  double m_minorRadiusSquared;
-};
-
-template <typename Shape>
-QVector<float> MainWindow::GeneratePointVolume(int count, Shape shape)
-{
-  QVector<float> result;
-  double x, y, z;
-
-  QProgressDialog progress("Generating points...", "Cancel", 0, count, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.setMinimumDuration(1000);
-
-  int step = qMax(1.0, count/100.0);
-
-  for(int i = 0; i < count; ++i)
-  {
-    do {
-      x = (double)qrand()/RAND_MAX - 0.5;
-      y = (double)qrand()/RAND_MAX - 0.5;
-      z = (double)qrand()/RAND_MAX - 0.5;
-    } while (shape(x,y,z) > 0.0);
-
-    result.push_back(x);
-    result.push_back(y);
-    result.push_back(z);
-
-    if(i % step == 0)
-    {
-      progress.setValue(i);
-    }
-
-    if(progress.wasCanceled())
-      break;
-  }
-
-  progress.setValue(count);
-
-  return result;
-}
-
-template <typename Shape>
-QVector<float> MainWindow::GeneratePointSurface(int count, Shape shape, double delta)
-{
-  QVector<float> result;
-  double x, y, z;
-
-  QProgressDialog progress("Generating points...", "Cancel", 0, count, this);
-  progress.setWindowModality(Qt::WindowModal);
-  progress.setMinimumDuration(1000);
-
-  int step = qMax(1.0, count/100.0);
-
-  for(int i = 0; i < count; ++i)
-  {
-    do {
-      x = (double)qrand()/RAND_MAX - 0.5;
-      y = (double)qrand()/RAND_MAX - 0.5;
-      z = (double)qrand()/RAND_MAX - 0.5;
-    } while (qAbs(shape(x,y,z)) > delta);
-
-    result.push_back(x);
-    result.push_back(y);
-    result.push_back(z);
-
-    if(i % step == 0)
-    {
-      progress.setValue(i);
-    }
-
-    if(progress.wasCanceled())
-      break;
-  }
-
-  progress.setValue(count);
-
-  return result;
-}
+#include "PointGenerator.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -260,44 +128,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setAcceptDrops(true);
 }
 
-void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
-{
-  QVector<float> points;
-
-  float delta = 0.001;
-
-  if(shape == "Cube")
-  {
-    if(!asSurface)
-      points = GeneratePointVolume(count, Cube());
-    else
-      points = GeneratePointSurface(count, Cube(1.0 - delta), delta);
-  }
-  if(shape == "Sphere")
-  {
-    if(!asSurface)
-      points = GeneratePointVolume(count, Sphere());
-    else
-      points = GeneratePointSurface(count, Sphere(0.5 - delta), delta);
-  }
-  if(shape == "Torus")
-  {
-    if(!asSurface)
-      points = GeneratePointVolume(count, Torus());
-    else
-      points = GeneratePointSurface(count, Torus(0.3 - delta, 0.2 - delta), delta);
-  }
-  if(shape == "Cylinder")
-  {
-    if(!asSurface)
-      points = GeneratePointVolume(count, Cylinder());
-    else
-      points = GeneratePointSurface(count, Cylinder(0.5 - delta), delta);
-  }
-
-  m_viewer->setPointModel(points);
-}
-
 void MainWindow::openFile()
 {
   // Get file to open
@@ -379,6 +209,24 @@ void MainWindow::openFile(const QString &path)
 bool MainWindow::canRead(const QString &path)
 {
   return PLYLoader::canRead(path);
+}
+
+void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
+{
+  PointGenerator generator;
+  QProgressDialog progress(this);
+  progress.setWindowModality(Qt::WindowModal);
+
+  connect(&generator, SIGNAL(setRange(int,int)), &progress,
+          SLOT(setRange(int,int)));
+  connect(&generator, SIGNAL(progress(int)), &progress, SLOT(setValue(int)));
+  connect(&progress, SIGNAL(canceled()), &generator, SLOT(cancel()));
+
+  PointCloud cloud = generator.createPointCloud(shape, count, asSurface);
+
+  progress.hide();
+
+  m_viewer->setPointCloud(cloud);
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

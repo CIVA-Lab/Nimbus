@@ -20,13 +20,6 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
-  template <typename Shape>
-  QVector<float> GeneratePointVolume(int count, Shape shape);
-
-  template <typename Shape>
-  QVector<float> GeneratePointSurface(int count, Shape shape,
-                                      double epsilon = 0.01);
-
   bool canRead(const QString& path);
 
 public slots:
