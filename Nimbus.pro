@@ -1,33 +1,18 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2013-05-23T17:53:50
-#
-#-------------------------------------------------
-
 QT       += core gui opengl xml
 
 TARGET = Nimbus
 TEMPLATE = app
 ICON = Nimbus.icns
 
-macx {
-INCLUDEPATH *= extern/macx/include
-LIBS *= -Lextern/macx/lib -lQGLViewer
-}
-
 win32 {
 #CONFIG += console
 CONFIG += static
 DEFINES += QGLVIEWER_STATIC
-INCLUDEPATH += extern/win32/include
-LIBS += -L../extern/win32/lib -llas -llaszip -lQGLViewer
 RC_FILE = Nimbus.rc
 }
 
 unix:!macx {
 DEFINES += NO_VBLANK_SYNC
-INCLUDEPATH += ../local/include
-LIBS += -L../local/lib -llas -llaszip -lboost_thread-mt -lQGLViewer
 }
 
 INCLUDEPATH += 3rdparty/rply
@@ -69,3 +54,34 @@ CONFIG(static):{
 }
 
 
+# libQGLViewer source and headers
+DEFINES *= NO_VECTORIAL_RENDER
+
+INCLUDEPATH += 3rdparty
+
+HEADERS *= 3rdparty/QGLViewer/QGLViewer.h \
+    3rdparty/QGLViewer/camera.h \
+    3rdparty/QGLViewer/manipulatedFrame.h \
+    3rdparty/QGLViewer/manipulatedCameraFrame.h \
+    3rdparty/QGLViewer/frame.h \
+    3rdparty/QGLViewer/constraint.h \
+    3rdparty/QGLViewer/keyFrameInterpolator.h \
+    3rdparty/QGLViewer/mouseGrabber.h \
+    3rdparty/QGLViewer/quaternion.h \
+    3rdparty/QGLViewer/vec.h \
+    3rdparty/QGLViewer/domUtils.h \
+    3rdparty/QGLViewer/config.h
+
+SOURCES *= 3rdparty/QGLViewer/qglviewer.cpp \
+    3rdparty/QGLViewer/camera.cpp \
+    3rdparty/QGLViewer/manipulatedFrame.cpp \
+    3rdparty/QGLViewer/manipulatedCameraFrame.cpp \
+    3rdparty/QGLViewer/frame.cpp \
+    3rdparty/QGLViewer/saveSnapshot.cpp \
+    3rdparty/QGLViewer/constraint.cpp \
+    3rdparty/QGLViewer/keyFrameInterpolator.cpp \
+    3rdparty/QGLViewer/mouseGrabber.cpp \
+    3rdparty/QGLViewer/quaternion.cpp \
+    3rdparty/QGLViewer/vec.cpp
+
+FORMS *= 3rdparty/QGLViewer/ImageInterface.ui
