@@ -46,13 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Update default OpenGL format
     QGLFormat::setDefaultFormat(format);
 
+    // Create viewer; don't set as the central widget until later. This
+    // suppresses an "Invalid Drawable" message for OS X
     m_viewer = new Viewer();
-
-    // Show viewer before adding to main window;  supressed "Invalid Drawable"
-    // error on OS X
-    m_viewer->show();
-
-    setCentralWidget(m_viewer);
 
     m_createOptions = new CreatePointCloudDialog(this);
     QMenu *fileMenu = menuBar()->addMenu("File");
@@ -122,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_viewer->setMultisample(true);
     m_viewer->setFastInteraction(false);
     m_viewer->setPointDensity(100);
+
+    // Set viewer as central widget
+    setCentralWidget(m_viewer);
 
     resize(825,550);
 
