@@ -58,7 +58,7 @@ DEFINES *= NO_VECTORIAL_RENDER
 
 INCLUDEPATH += 3rdparty
 
-HEADERS *= 3rdparty/QGLViewer/QGLViewer.h \
+HEADERS *= 3rdparty/QGLViewer/qglviewer.h \
     3rdparty/QGLViewer/camera.h \
     3rdparty/QGLViewer/manipulatedFrame.h \
     3rdparty/QGLViewer/manipulatedCameraFrame.h \
