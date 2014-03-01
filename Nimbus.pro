@@ -6,8 +6,6 @@ ICON = Nimbus.icns
 
 win32 {
 #CONFIG += console
-CONFIG += static
-DEFINES += QGLVIEWER_STATIC
 RC_FILE = Nimbus.rc
 }
 
@@ -49,6 +47,7 @@ RESOURCES += \
 CONFIG(static):{
   message(Static compile enabled)
   DEFINES += NIMBUS_STATIC
+  DEFINES += QGLVIEWER_STATIC
   QTPLUGIN += \
       qico
 }
