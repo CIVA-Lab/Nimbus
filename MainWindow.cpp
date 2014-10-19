@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     format.setOption(QGL::SampleBuffers);
     // Request alpha buffer
     format.setAlpha(true);
+    // Request stereo
+    format.setStereo(true);
     // Update default OpenGL format
     QGLFormat::setDefaultFormat(format);
 
