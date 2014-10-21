@@ -194,6 +194,21 @@ void Viewer::restoreView()
   showEntireScene();
 }
 
+void Viewer::setIODistance(double distance)
+{
+  camera()->setIODistance((float) distance);
+}
+
+void Viewer::setScreenWidth(double width)
+{
+  camera()->setPhysicalScreenWidth((float) width);
+}
+
+void Viewer::setFocusDistance(double distance)
+{
+  camera()->setFocusDistance((float) distance);
+}
+
 void Viewer::init()
 {
 #ifdef DEBUG_GL_CAPABILITIES

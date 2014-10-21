@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     3rdparty/rply/rply.c \
     PointCloud.cpp \
     PLYLoader.cpp \
-    PointGenerator.cpp
+    PointGenerator.cpp \
+    StereoOptionsDialog.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
@@ -32,11 +33,13 @@ HEADERS  += MainWindow.h \
     3rdparty/rply/rply.h \
     PointCloud.h \
     PLYLoader.h \
-    PointGenerator.h
+    PointGenerator.h \
+    StereoOptionsDialog.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
-    CreatePointCloudDialog.ui
+    CreatePointCloudDialog.ui \
+    StereoOptionsDialog.ui
 
 OTHER_FILES += \
     Nimbus.rc

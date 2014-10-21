@@ -45,6 +45,10 @@ public slots:
 
   void restoreView();
 
+  void setIODistance(double distance);
+  void setScreenWidth(double width);
+  void setFocusDistance(double distance);
+
   void toggleTurntable();
   void resetTurntable();
   void increaseTurntableSpeed();

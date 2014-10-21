@@ -6,6 +6,7 @@
 #include <QIODevice>
 #include "DisplayOptionsDialog.h"
 #include "CreatePointCloudDialog.h"
+#include "StereoOptionsDialog.h"
 #include "Viewer.h"
 
 namespace Ui {
@@ -40,6 +41,7 @@ private:
 
   DisplayOptionsDialog* m_displayOptions;
   CreatePointCloudDialog* m_createOptions;
+  StereoOptionsDialog* m_stereoOptions;
 };
 
 #endif // MAINWINDOW_H
