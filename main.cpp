@@ -5,13 +5,6 @@
 #include "MainWindow.h"
 #include "Viewer.h"
 
-#include <QDebug>
-
-// Needed for static windows build
-#ifdef NIMBUS_STATIC
-Q_IMPORT_PLUGIN(qico)
-#endif
-
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(Nimbus);

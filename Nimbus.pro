@@ -51,8 +51,6 @@ CONFIG(static):{
   message(Static compile enabled)
   DEFINES += NIMBUS_STATIC
   DEFINES += QGLVIEWER_STATIC
-  QTPLUGIN += \
-      qico
 }
 
 
