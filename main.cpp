@@ -15,6 +15,11 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon(":/Nimbus.ico"));
 #endif
 
+#if QT_VERSION >= 0x050100
+    // Enable retina icons
+    a.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+
     MainWindow w;
     w.show();
 

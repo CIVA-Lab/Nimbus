@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>Nimbus.ico</file>
-        <file alias="Logo">MULogo.png</file>
+        <file>MULogo.png</file>
+        <file>MULogo@2x.png</file>
     </qresource>
 </RCC>

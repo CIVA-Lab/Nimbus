@@ -37,8 +37,9 @@ Viewer::Viewer(QWidget *parent) :
   setKeyDescription(Qt::Key_Plus, "Increase turntable speed");
   setShortcut(EXIT_VIEWER, 0);
 
-  // Load logo pixmap
-  m_logoPixmap = QPixmap(":/Logo");
+  // Load logo pixmap with extent of 150 points.  QIcon will return a retina
+  // quality version pixmap if available
+  m_logoPixmap = QIcon(":/MULogo.png").pixmap(150);
 
   // Install manipulated frame
   setManipulatedFrame(new ManipulatedFrame());
@@ -311,10 +312,14 @@ void Viewer::postDraw()
     // Alpha blending needed for transparency
     glEnable(GL_BLEND);
 
+    // Account for retina sized pixmap
+    QSize logoSize = m_logoPixmap.size()/m_logoPixmap.devicePixelRatio();
+
+    QRectF target(QPointF(width() - logoSize.width(),
+                          height() - logoSize.height()), logoSize);
+
     // Draw texture in lower right
-    drawTexture(QPointF(width() - m_logoPixmap.width(),
-                        height() - m_logoPixmap.height()),
-                m_logoTextureId);
+    drawTexture(target, m_logoTextureId);
 
     // Revert matrices
     stopScreenCoordinatesSystem();
