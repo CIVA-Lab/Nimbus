@@ -45,6 +45,16 @@ MainWindow::MainWindow(QWidget *parent) :
     format.setAlpha(true);
     // Request stereo
     format.setStereo(true);
+
+    // Create OpenGL context
+    QGLContext context(format);
+    // Try to create context with format
+    if(!context.create())
+    {
+      // If context couldn't be created, disable stereo buffers
+      format.setStereo(false);
+    }
+
     // Update default OpenGL format
     QGLFormat::setDefaultFormat(format);
 
