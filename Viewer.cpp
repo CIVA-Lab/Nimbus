@@ -37,9 +37,9 @@ Viewer::Viewer(QWidget *parent) :
   setKeyDescription(Qt::Key_Plus, "Increase turntable speed");
   setShortcut(EXIT_VIEWER, 0);
 
-  // Load logo pixmap with extent of 150 points.  QIcon will return a retina
-  // quality version pixmap if available
-  m_logoPixmap = QIcon(":/MULogo.png").pixmap(150);
+  // Load logo pixmap at 150x172.  QIcon will return a retina quality version
+  //  pixmap if available
+  m_logoPixmap = QIcon(":/MULogo.png").pixmap(150,172);
 
   // Install manipulated frame
   setManipulatedFrame(new ManipulatedFrame());
