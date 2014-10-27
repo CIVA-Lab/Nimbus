@@ -24,6 +24,7 @@ Viewer::Viewer(QWidget *parent) :
   m_smoothPoints(true),
   m_fastInteraction(false),
   m_fastInteractionMax(250000),
+  m_swapLeftRight(false),
   m_showLogo(true),
   m_turntableRPM(1.0),
   m_turntableStarted(false)
@@ -72,6 +73,8 @@ bool Viewer::setPointCloud(const PointCloud &cloud)
 
   showEntireScene();
   setPointDensity(100);
+
+  notifyStereoParametersChanged();
 
   return true;
 }
@@ -193,21 +196,33 @@ void Viewer::restoreView()
   // Restore default view by creating new camera and fitting scene
   setCamera(new Camera());
   showEntireScene();
+
+  // This changes some parameters related to stereo; force refresh
+  notifyStereoParametersChanged();
 }
 
 void Viewer::setIODistance(double distance)
 {
   camera()->setIODistance((float) distance);
+  update();
 }
 
 void Viewer::setScreenWidth(double width)
 {
   camera()->setPhysicalScreenWidth((float) width);
+  update();
 }
 
 void Viewer::setFocusDistance(double distance)
 {
   camera()->setFocusDistance((float) distance);
+  update();
+}
+
+void Viewer::setSwapLeftRight(bool swap)
+{
+  m_swapLeftRight = swap;
+  update();
 }
 
 void Viewer::init()
@@ -251,6 +266,8 @@ void Viewer::init()
 
 void Viewer::draw()
 {
+//  drawAnaglyph();
+//  return;
   // Apply turntable frame
   glPushMatrix();
   glMultMatrixd(manipulatedFrame()->matrix());
@@ -293,6 +310,77 @@ void Viewer::draw()
 
   // Restore transforms
   glPopMatrix();
+}
+
+void Viewer::drawNoColor()
+{
+  // Apply turntable frame
+  glPushMatrix();
+  glMultMatrixd(manipulatedFrame()->matrix());
+
+  glPointSize(m_pointSize);
+
+  if(!m_depthMasking)
+    glDepthMask(GL_FALSE);
+
+  if(m_multisample)
+    glEnable(GL_MULTISAMPLE);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  if(m_colorPoints)
+    glEnableClientState(GL_COLOR_ARRAY);
+
+  if(!m_colorBuffer.isCreated())
+  {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glColorPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+  } else {
+    m_vertexBuffer.bind();
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+    m_vertexBuffer.release();
+
+    m_colorBuffer.bind();
+    glColorPointer(3, GL_FLOAT, 0, 0);
+    m_colorBuffer.release();
+  }
+
+  glDrawArrays(GL_POINTS, 0, m_vertexCount * m_density/100.0);
+
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+
+  glDepthMask(GL_TRUE);
+
+  // Restore transforms
+  glPopMatrix();
+}
+
+void Viewer::drawAnaglyph()
+{
+  camera()->loadProjectionMatrixStereo(true);
+  camera()->loadModelViewMatrixStereo(true);
+
+  // Save OpenGL state
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+  glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+  drawNoColor();
+
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  camera()->loadProjectionMatrixStereo(false);
+  camera()->loadModelViewMatrixStereo(false);
+
+  glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+
+  drawNoColor();
+
+  // Restore OpenGL state
+  glPopAttrib();
+
 }
 
 void Viewer::postDraw()
@@ -382,6 +470,30 @@ void Viewer::fastDraw()
 
 }
 
+// Override parent implementation for left/right swapping
+void Viewer::preDrawStereo(bool leftBuffer)
+{
+  // Set buffer to draw in
+  // Seems that SGI and Crystal Eyes are not synchronized correctly !
+  // That's why we don't draw in the appropriate buffer...
+  if (!leftBuffer)
+      glDrawBuffer(GL_BACK_LEFT);
+  else
+      glDrawBuffer(GL_BACK_RIGHT);
+
+  // If left/right should be swapped
+  if(m_swapLeftRight) leftBuffer = !leftBuffer;
+
+  // Clear the buffer where we're going to draw
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // GL_PROJECTION matrix
+  camera()->loadProjectionMatrixStereo(leftBuffer);
+  // GL_MODELVIEW matrix
+  camera()->loadModelViewMatrixStereo(leftBuffer);
+
+  Q_EMIT drawNeeded();
+}
+
 bool Viewer::bindToVertexBuffer(const QVector<float> &vertices)
 {
   // Ensure number of vertices is divisible by 3
@@ -439,6 +551,13 @@ bool Viewer::loadColorsToBuffer(const QVector<float> &colors)
                           colors.count() * sizeof(float));
 
   return glGetError() == GL_NO_ERROR;
+}
+
+void Viewer::notifyStereoParametersChanged()
+{
+  emit IODistanceChanged((double) camera()->IODistance());
+  emit focusDistanceChanged((double) camera()->focusDistance());
+  emit physicalScreenWidthChanged((double) camera()->physicalScreenWidth());
 }
 
 void Viewer::keyPressEvent(QKeyEvent *e)

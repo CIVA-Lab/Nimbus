@@ -118,14 +118,24 @@ MainWindow::MainWindow(QWidget *parent) :
     displayMenu->addAction("Display Options...", m_displayOptions,
                            SLOT(show()));
 
-
     // Create stereo options dialog
     m_stereoOptions = new StereoOptionsDialog(this);
+    m_stereoOptions->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
     // Sync viewer and dialog
     connect(m_stereoOptions, &StereoOptionsDialog::IODistanceChanged,
             m_viewer, &Viewer::setIODistance);
     connect(m_stereoOptions, &StereoOptionsDialog::screenWidthChanged,
             m_viewer, &Viewer::setScreenWidth);
+    connect(m_stereoOptions, &StereoOptionsDialog::focusDistanceChanged,
+            m_viewer, &Viewer::setFocusDistance);
+    connect(m_stereoOptions, &StereoOptionsDialog::swapLeftRightChanged,
+            m_viewer, &Viewer::setSwapLeftRight);
+
+    // Sync viewer values back to dialog
+    connect(m_viewer, &Viewer::focusDistanceChanged, m_stereoOptions,
+            &StereoOptionsDialog::setFocusDistance);
+    connect(m_viewer, &Viewer::physicalScreenWidthChanged, m_stereoOptions,
+            &StereoOptionsDialog::setScreenWidth);
 
     m_stereoOptions->setIODistance(m_viewer->camera()->IODistance());
     m_stereoOptions->setScreenWidth(m_viewer->camera()->physicalScreenWidth());

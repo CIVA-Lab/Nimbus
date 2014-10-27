@@ -14,6 +14,8 @@ StereoOptionsDialog::StereoOptionsDialog(QWidget *parent) :
           SIGNAL(screenWidthChanged(double)));
   connect(ui->focusDistanceSpinBox, SIGNAL(valueChanged(double)), this,
           SIGNAL(focusDistanceChanged(double)));
+  connect(ui->swapCheckBox, SIGNAL(toggled(bool)), this,
+          SIGNAL(swapLeftRightChanged(bool)));
 }
 
 StereoOptionsDialog::~StereoOptionsDialog()
@@ -23,15 +25,23 @@ StereoOptionsDialog::~StereoOptionsDialog()
 
 void StereoOptionsDialog::setIODistance(double d)
 {
-  ui->ioDistanceSpinBox->setValue(d);
+  if(ui->ioDistanceSpinBox->value() != d)
+    ui->ioDistanceSpinBox->setValue(d);
 }
 
 void StereoOptionsDialog::setScreenWidth(double d)
 {
-  ui->screenWidthSpinBox->setValue(d);
+  if(ui->screenWidthSpinBox->value() != d)
+    ui->screenWidthSpinBox->setValue(d);
 }
 
 void StereoOptionsDialog::setFocusDistance(double d)
 {
-  ui->focusDistanceSpinBox->setValue(d);
+  if(ui->screenWidthSpinBox->value() != d)
+    ui->focusDistanceSpinBox->setValue(d);
+}
+
+void StereoOptionsDialog::setSwapLeftRight(bool checked)
+{
+  ui->swapCheckBox->setChecked(checked);
 }

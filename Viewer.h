@@ -29,6 +29,11 @@ signals:
 
   void fastInteractionChanged(bool);
 
+  // Signals for changes in stereo parameters
+  void IODistanceChanged(double);
+  void focusDistanceChanged(double);
+  void physicalScreenWidthChanged(double);
+
   void error(QString);
 
 public slots:
@@ -48,6 +53,7 @@ public slots:
   void setIODistance(double distance);
   void setScreenWidth(double width);
   void setFocusDistance(double distance);
+  void setSwapLeftRight(bool swap);
 
   void toggleTurntable();
   void resetTurntable();
@@ -63,12 +69,17 @@ public slots:
 protected:
   void init();
   void draw();
+  void drawNoColor();
+  void drawAnaglyph();
   void postDraw();
   void fastDraw();
+  void preDrawStereo(bool leftBuffer);
   void keyPressEvent(QKeyEvent *);
 
   bool bindToVertexBuffer(const QVector<float> &vertices);
   bool loadColorsToBuffer(const QVector<float> &colors);
+
+  void notifyStereoParametersChanged();
 
 private:
   QString speedToString();
@@ -90,6 +101,9 @@ private:
   bool m_fastInteraction;
 
   int m_fastInteractionMax;
+
+  // Swap eyes for stereo
+  bool m_swapLeftRight;
 
   // Onscreen logo
   QPixmap m_logoPixmap;

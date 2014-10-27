@@ -19,11 +19,13 @@ signals:
   void IODistanceChanged(double);
   void screenWidthChanged(double);
   void focusDistanceChanged(double);
+  void swapLeftRightChanged(bool);
 
 public slots:
   void setIODistance(double d);
   void setScreenWidth(double d);
   void setFocusDistance(double d);
+  void setSwapLeftRight(bool);
 
 private:
   Ui::StereoOptionsDialog *ui;
