@@ -261,7 +261,7 @@ void Viewer::init()
   // Bind logo to texture
   m_logoTextureId = bindTexture(m_logoPixmap);
 
-  qglClearColor(QColor(51,51,51,185));
+  qglClearColor(QColor(51,51,51,255));
 }
 
 void Viewer::draw()
@@ -366,7 +366,11 @@ void Viewer::drawAnaglyph()
   // Save OpenGL state
   glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-  glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+  if(!m_swapLeftRight)
+    glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
+  else
+    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+
   drawNoColor();
 
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -374,7 +378,10 @@ void Viewer::drawAnaglyph()
   camera()->loadProjectionMatrixStereo(false);
   camera()->loadModelViewMatrixStereo(false);
 
-  glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+  if(!m_swapLeftRight)
+    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+  else
+    glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
   drawNoColor();
 
