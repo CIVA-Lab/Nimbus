@@ -266,8 +266,10 @@ void Viewer::init()
 
 void Viewer::draw()
 {
+//  drawSideBySide();
 //  drawAnaglyph();
 //  return;
+
   // Apply turntable frame
   glPushMatrix();
   glMultMatrixd(manipulatedFrame()->matrix());
@@ -388,6 +390,28 @@ void Viewer::drawAnaglyph()
   // Restore OpenGL state
   glPopAttrib();
 
+}
+
+void Viewer::drawSideBySide()
+{
+  GLint vp[4];
+
+  glGetIntegerv(GL_VIEWPORT, vp);
+
+  glViewport(vp[0], vp[1], vp[2]/2.0, vp[3]);
+  camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
+
+  drawNoColor();
+
+  glViewport(vp[0] + vp[2]/2.0, vp[1], vp[2]/2.0, vp[3]);
+
+  camera()->loadProjectionMatrixStereo(m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(m_swapLeftRight);
+
+  drawNoColor();
+
+  glViewport(vp[0], vp[1], vp[2], vp[3]);
 }
 
 void Viewer::postDraw()

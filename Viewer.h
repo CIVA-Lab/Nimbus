@@ -71,6 +71,7 @@ protected:
   void draw();
   void drawNoColor();
   void drawAnaglyph();
+  void drawSideBySide();
   void postDraw();
   void fastDraw();
   void preDrawStereo(bool leftBuffer);
