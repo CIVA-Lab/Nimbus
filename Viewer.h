@@ -15,11 +15,23 @@ public:
 
   bool setPointCloud(const PointCloud& cloud);
 
-  bool multisampleAvailable();
+  bool multisampleAvailable() const;
 
-  bool stereoEnabled() { return m_stereo; }
+  bool stereoEnabled() const { return m_stereo; }
+
+  bool supportsHardwareStereo() const;
 
   QVector<float> m_fov;
+
+  enum StereoMode
+  {
+    Hardware,
+    Red_Cyan,
+    Red_Blue,
+    Side_by_Side
+  };
+
+  StereoMode stereoMode() const { return m_stereoMode; }
 
 signals:
   void pointSizeChanged(int pointSize);
@@ -35,7 +47,7 @@ signals:
   void IODistanceChanged(double);
   void focusDistanceChanged(double);
   void physicalScreenWidthChanged(double);
-
+  void stereoModeChanged(StereoMode);
   void error(QString);
 
 public slots:
@@ -59,6 +71,7 @@ public slots:
 
   void setStereo(bool stereo = true);
   void toggleStereo();
+  void setStereoMode(StereoMode mode);
 
   void toggleTurntable();
   void resetTurntable();
@@ -111,8 +124,10 @@ private:
 
   // Swap eyes for stereo
   bool m_swapLeftRight;
-
+  // Stereo enabled
   bool m_stereo;
+  // Stereo mode
+  StereoMode m_stereoMode;
 
   // Onscreen logo
   QPixmap m_logoPixmap;

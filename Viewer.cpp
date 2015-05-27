@@ -45,6 +45,12 @@ Viewer::Viewer(QWidget *parent) :
 
   // Install manipulated frame
   setManipulatedFrame(new ManipulatedFrame());
+
+  // Set default stereo mode; use hardware when available
+  if(supportsHardwareStereo())
+    setStereoMode(Hardware);
+  else
+    setStereoMode(Red_Cyan);
 }
 
 bool Viewer::setPointCloud(const PointCloud &cloud)
@@ -80,9 +86,14 @@ bool Viewer::setPointCloud(const PointCloud &cloud)
   return true;
 }
 
-bool Viewer::multisampleAvailable()
+bool Viewer::multisampleAvailable() const
 {
   return format().testOption(QGL::SampleBuffers);
+}
+
+bool Viewer::supportsHardwareStereo() const
+{
+  return format().stereo();
 }
 
 void Viewer::setPointSize(int pointSize)
@@ -238,6 +249,16 @@ void Viewer::setStereo(bool stereo)
 void Viewer::toggleStereo()
 {
   setStereo(!stereoEnabled());
+}
+
+void Viewer::setStereoMode(Viewer::StereoMode mode)
+{
+  if(m_stereoMode != mode)
+  {
+    m_stereoMode = mode;
+    emit stereoModeChanged(m_stereoMode);
+    update();
+  }
 }
 
 void Viewer::init()
@@ -518,7 +539,17 @@ void Viewer::paintGL()
 {
   if(stereoEnabled())
   {
-    drawRedCyanStereo();
+    switch(m_stereoMode)
+    {
+      case Hardware:
+        drawHardwareStereo(); break;
+      case Red_Cyan:
+        drawRedCyanStereo(); break;
+      case Red_Blue:
+        drawRedBlueStereo(); break;
+      case Side_by_Side:
+        drawSideBySideStereo(); break;
+    }
   }
   else
   {
