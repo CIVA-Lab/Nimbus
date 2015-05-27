@@ -25,6 +25,7 @@ Viewer::Viewer(QWidget *parent) :
   m_fastInteraction(false),
   m_fastInteractionMax(250000),
   m_swapLeftRight(false),
+  m_stereo(false),
   m_showLogo(true),
   m_turntableRPM(1.0),
   m_turntableStarted(false)
@@ -225,6 +226,20 @@ void Viewer::setSwapLeftRight(bool swap)
   update();
 }
 
+void Viewer::setStereo(bool stereo)
+{
+  m_stereo = stereo;
+
+  Q_EMIT(stereoChanged(m_stereo));
+
+  update();
+}
+
+void Viewer::toggleStereo()
+{
+  setStereo(!stereoEnabled());
+}
+
 void Viewer::init()
 {
 #ifdef DEBUG_GL_CAPABILITIES
@@ -266,10 +281,6 @@ void Viewer::init()
 
 void Viewer::draw()
 {
-//  drawSideBySide();
-//  drawAnaglyph();
-//  return;
-
   // Apply turntable frame
   glPushMatrix();
   glMultMatrixd(manipulatedFrame()->matrix());
@@ -314,105 +325,107 @@ void Viewer::draw()
   glPopMatrix();
 }
 
-void Viewer::drawNoColor()
+void Viewer::drawRedCyanStereo()
 {
-  // Apply turntable frame
-  glPushMatrix();
-  glMultMatrixd(manipulatedFrame()->matrix());
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glPointSize(m_pointSize);
-
-  if(!m_depthMasking)
-    glDepthMask(GL_FALSE);
-
-  if(m_multisample)
-    glEnable(GL_MULTISAMPLE);
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-
-  if(m_colorPoints)
-    glEnableClientState(GL_COLOR_ARRAY);
-
-  if(!m_colorBuffer.isCreated())
-  {
-    m_vertexBuffer.bind();
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-    glColorPointer(3, GL_FLOAT, 0, 0);
-    m_vertexBuffer.release();
-  } else {
-    m_vertexBuffer.bind();
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-    m_vertexBuffer.release();
-
-    m_colorBuffer.bind();
-    glColorPointer(3, GL_FLOAT, 0, 0);
-    m_colorBuffer.release();
-  }
-
-  glDrawArrays(GL_POINTS, 0, m_vertexCount * m_density/100.0);
-
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
-  glDepthMask(GL_TRUE);
-
-  // Restore transforms
-  glPopMatrix();
-}
-
-void Viewer::drawAnaglyph()
-{
-  camera()->loadProjectionMatrixStereo(true);
-  camera()->loadModelViewMatrixStereo(true);
-
-  // Save OpenGL state
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-  if(!m_swapLeftRight)
-    glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-  else
-    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-
-  drawNoColor();
-
-  glClear(GL_DEPTH_BUFFER_BIT);
-
-  camera()->loadProjectionMatrixStereo(false);
-  camera()->loadModelViewMatrixStereo(false);
-
-  if(!m_swapLeftRight)
-    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
-  else
-    glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-  drawNoColor();
-
-  // Restore OpenGL state
-  glPopAttrib();
-
-}
-
-void Viewer::drawSideBySide()
-{
-  GLint vp[4];
-
-  glGetIntegerv(GL_VIEWPORT, vp);
-
-  glViewport(vp[0], vp[1], vp[2]/2.0, vp[3]);
   camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
   camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
 
-  drawNoColor();
+  glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
 
-  glViewport(vp[0] + vp[2]/2.0, vp[1], vp[2]/2.0, vp[3]);
+  draw();
+
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 
   camera()->loadProjectionMatrixStereo(m_swapLeftRight);
   camera()->loadModelViewMatrixStereo(m_swapLeftRight);
 
-  drawNoColor();
+  draw();
 
+  // Restore color mask
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+void Viewer::drawRedBlueStereo()
+{
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
+
+  glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE);
+
+  draw();
+
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
+
+  camera()->loadProjectionMatrixStereo(m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(m_swapLeftRight);
+
+  draw();
+
+  // Restore color mask
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+}
+
+void Viewer::drawSideBySideStereo()
+{
+  // Get viewport
+  GLint vp[4];
+  glGetIntegerv(GL_VIEWPORT, vp);
+
+  // Set left side viewport
+  glViewport(vp[0], vp[1], vp[2]/2.0, vp[3]);
+  // Load left eye transforms
+  camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
+
+  // Draw
+  draw();
+
+  // Set right side viewport
+  glViewport(vp[0] + vp[2]/2.0, vp[1], vp[2]/2.0, vp[3]);
+  // Load right eye transforms
+  camera()->loadProjectionMatrixStereo(m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(m_swapLeftRight);
+
+  // Draw
+  draw();
+
+  // Restore viewport
   glViewport(vp[0], vp[1], vp[2], vp[3]);
 }
+
+void Viewer::drawHardwareStereo()
+{
+  // Clear left buffer
+  glDrawBuffer(GL_BACK_LEFT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Set left eye transforms
+  camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
+
+  // Draw
+  draw();
+
+  // Clear right buffer
+  glDrawBuffer(GL_BACK_RIGHT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Set right eye transforms
+  camera()->loadProjectionMatrixStereo(m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(m_swapLeftRight);
+
+  // Draw
+  draw();
+ }
 
 void Viewer::postDraw()
 {
@@ -501,28 +514,26 @@ void Viewer::fastDraw()
 
 }
 
-// Override parent implementation for left/right swapping
-void Viewer::preDrawStereo(bool leftBuffer)
+void Viewer::paintGL()
 {
-  // Set buffer to draw in
-  // Seems that SGI and Crystal Eyes are not synchronized correctly !
-  // That's why we don't draw in the appropriate buffer...
-  if (!leftBuffer)
-      glDrawBuffer(GL_BACK_LEFT);
+  if(stereoEnabled())
+  {
+    drawRedCyanStereo();
+  }
   else
-      glDrawBuffer(GL_BACK_RIGHT);
+  {
+    // Clears screen, set model view matrix...
+    preDraw();
+    // Used defined method. Default calls draw()
+    if(camera()->frame()->isManipulated())
+      fastDraw();
+    else
+      draw();
+    // Add visual hints: axis, camera, grid...
+    postDraw();
+  }
+  Q_EMIT drawFinished(true);
 
-  // If left/right should be swapped
-  if(m_swapLeftRight) leftBuffer = !leftBuffer;
-
-  // Clear the buffer where we're going to draw
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // GL_PROJECTION matrix
-  camera()->loadProjectionMatrixStereo(leftBuffer);
-  // GL_MODELVIEW matrix
-  camera()->loadModelViewMatrixStereo(leftBuffer);
-
-  Q_EMIT drawNeeded();
 }
 
 bool Viewer::bindToVertexBuffer(const QVector<float> &vertices)
@@ -601,6 +612,8 @@ void Viewer::keyPressEvent(QKeyEvent *e)
     if(isFullScreen()) setFullScreen(false); break;
   case Qt::Key_R:
     restoreView(); break;
+  case Qt::Key_S:
+    toggleStereo(); break;
   case Qt::Key_T:
     // 't' key
     if(e->modifiers() == Qt::NoModifier)

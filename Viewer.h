@@ -17,6 +17,8 @@ public:
 
   bool multisampleAvailable();
 
+  bool stereoEnabled() { return m_stereo; }
+
   QVector<float> m_fov;
 
 signals:
@@ -55,6 +57,9 @@ public slots:
   void setFocusDistance(double distance);
   void setSwapLeftRight(bool swap);
 
+  void setStereo(bool stereo = true);
+  void toggleStereo();
+
   void toggleTurntable();
   void resetTurntable();
   void increaseTurntableSpeed();
@@ -69,12 +74,13 @@ public slots:
 protected:
   void init();
   void draw();
-  void drawNoColor();
-  void drawAnaglyph();
-  void drawSideBySide();
+  void drawRedCyanStereo();
+  void drawRedBlueStereo();
+  void drawSideBySideStereo();
+  void drawHardwareStereo();
   void postDraw();
   void fastDraw();
-  void preDrawStereo(bool leftBuffer);
+  void paintGL();
   void keyPressEvent(QKeyEvent *);
 
   bool bindToVertexBuffer(const QVector<float> &vertices);
@@ -105,6 +111,8 @@ private:
 
   // Swap eyes for stereo
   bool m_swapLeftRight;
+
+  bool m_stereo;
 
   // Onscreen logo
   QPixmap m_logoPixmap;
