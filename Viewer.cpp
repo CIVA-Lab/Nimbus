@@ -255,6 +255,12 @@ void Viewer::setStereoMode(Viewer::StereoMode mode)
 {
   if(m_stereoMode != mode)
   {
+    if(mode == Viewer::Hardware && !supportsHardwareStereo())
+    {
+      // Error; emit old mode to update caller
+      emit stereoModeChanged(m_stereoMode);
+      return;
+    }
     m_stereoMode = mode;
     emit stereoModeChanged(m_stereoMode);
     update();
@@ -400,6 +406,8 @@ void Viewer::drawSideBySideStereo()
   // Get viewport
   GLint vp[4];
   glGetIntegerv(GL_VIEWPORT, vp);
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Set left side viewport
   glViewport(vp[0], vp[1], vp[2]/2.0, vp[3]);

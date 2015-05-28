@@ -16,11 +16,20 @@ StereoOptionsDialog::StereoOptionsDialog(QWidget *parent) :
           SIGNAL(focusDistanceChanged(double)));
   connect(ui->swapCheckBox, SIGNAL(toggled(bool)), this,
           SIGNAL(swapLeftRightChanged(bool)));
+
+  connect(ui->stereoModeCombo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(updateStereoMode(int)));
 }
 
 StereoOptionsDialog::~StereoOptionsDialog()
 {
   delete ui;
+}
+
+void StereoOptionsDialog::addStereoMode(const QString &name,
+                                        Viewer::StereoMode mode)
+{
+  ui->stereoModeCombo->addItem(name, mode);
 }
 
 void StereoOptionsDialog::setIODistance(double d)
@@ -44,4 +53,22 @@ void StereoOptionsDialog::setFocusDistance(double d)
 void StereoOptionsDialog::setSwapLeftRight(bool checked)
 {
   ui->swapCheckBox->setChecked(checked);
+}
+
+void StereoOptionsDialog::setStereoMode(Viewer::StereoMode mode)
+{
+  int index = ui->stereoModeCombo->findData(mode);
+
+  if(ui->stereoModeCombo->currentIndex() != index)
+  {
+    ui->stereoModeCombo->setCurrentIndex(index);
+    emit stereoModeChanged(mode);
+  }
+}
+
+void StereoOptionsDialog::updateStereoMode(int index)
+{
+  int mode = ui->stereoModeCombo->itemData(index).toInt();
+
+  emit stereoModeChanged((Viewer::StereoMode)mode);
 }

@@ -130,16 +130,27 @@ MainWindow::MainWindow(QWidget *parent) :
             m_viewer, &Viewer::setFocusDistance);
     connect(m_stereoOptions, &StereoOptionsDialog::swapLeftRightChanged,
             m_viewer, &Viewer::setSwapLeftRight);
+    connect(m_stereoOptions, &StereoOptionsDialog::stereoModeChanged,
+            m_viewer, &Viewer::setStereoMode);
 
     // Sync viewer values back to dialog
     connect(m_viewer, &Viewer::focusDistanceChanged, m_stereoOptions,
             &StereoOptionsDialog::setFocusDistance);
     connect(m_viewer, &Viewer::physicalScreenWidthChanged, m_stereoOptions,
             &StereoOptionsDialog::setScreenWidth);
+    connect(m_viewer, &Viewer::stereoModeChanged, m_stereoOptions,
+            &StereoOptionsDialog::setStereoMode);
+
+    m_stereoOptions->addStereoMode("Red-Cyan", Viewer::Red_Cyan);
+    m_stereoOptions->addStereoMode("Red-Blue", Viewer::Red_Blue);
+    m_stereoOptions->addStereoMode("Side-by-Side", Viewer::Side_by_Side);
+    if(m_viewer->supportsHardwareStereo())
+      m_stereoOptions->addStereoMode("Hardware", Viewer::Hardware);
 
     m_stereoOptions->setIODistance(m_viewer->camera()->IODistance());
     m_stereoOptions->setScreenWidth(m_viewer->camera()->physicalScreenWidth());
     m_stereoOptions->setFocusDistance(m_viewer->camera()->focusDistance());
+    m_stereoOptions->setStereoMode(m_viewer->stereoMode());
 
     // Create menu item
     displayMenu->addAction("Stereo Options...", m_stereoOptions, SLOT(show()));
