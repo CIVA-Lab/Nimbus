@@ -144,6 +144,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_stereoOptions->addStereoMode("Red-Cyan", Viewer::Red_Cyan);
     m_stereoOptions->addStereoMode("Red-Blue", Viewer::Red_Blue);
     m_stereoOptions->addStereoMode("Side-by-Side", Viewer::Side_by_Side);
+    m_stereoOptions->addStereoMode("Stacked", Viewer::Stacked);
+
     if(m_viewer->supportsHardwareStereo())
       m_stereoOptions->addStereoMode("Hardware", Viewer::Hardware);
 

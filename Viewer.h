@@ -28,7 +28,8 @@ public:
     Hardware,
     Red_Cyan,
     Red_Blue,
-    Side_by_Side
+    Side_by_Side,
+    Stacked
   };
 
   StereoMode stereoMode() const { return m_stereoMode; }
@@ -90,6 +91,7 @@ protected:
   void drawRedCyanStereo();
   void drawRedBlueStereo();
   void drawSideBySideStereo();
+  void drawStackedStereo();
   void drawHardwareStereo();
   void postDraw();
   void fastDraw();

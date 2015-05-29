@@ -431,6 +431,36 @@ void Viewer::drawSideBySideStereo()
   glViewport(vp[0], vp[1], vp[2], vp[3]);
 }
 
+void Viewer::drawStackedStereo()
+{
+  // Get viewport
+  GLint vp[4];
+  glGetIntegerv(GL_VIEWPORT, vp);
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Set top  viewport
+  glViewport(vp[0], vp[1], vp[2], vp[3]/2.0);
+  // Load left eye transforms
+  camera()->loadProjectionMatrixStereo(!m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(!m_swapLeftRight);
+
+  // Draw
+  draw();
+
+  // Set bottom viewport
+  glViewport(vp[0], vp[1] + vp[3]/2.0, vp[2], vp[3]/2.0);
+  // Load right eye transforms
+  camera()->loadProjectionMatrixStereo(m_swapLeftRight);
+  camera()->loadModelViewMatrixStereo(m_swapLeftRight);
+
+  // Draw
+  draw();
+
+  // Restore viewport
+  glViewport(vp[0], vp[1], vp[2], vp[3]);
+}
+
 void Viewer::drawHardwareStereo()
 {
   // Clear left buffer
@@ -557,6 +587,8 @@ void Viewer::paintGL()
         drawRedBlueStereo(); break;
       case Side_by_Side:
         drawSideBySideStereo(); break;
+      case Stacked:
+        drawStackedStereo(); break;
     }
   }
   else
