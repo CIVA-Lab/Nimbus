@@ -4,3 +4,5 @@ Nimbus.app
 moc_*.cpp
 ui_*.h
 Makefile
+.qmake.stash
+qrc_*.cpp
