@@ -7,6 +7,7 @@
 #include "DisplayOptionsDialog.h"
 #include "CreatePointCloudDialog.h"
 #include "StereoOptionsDialog.h"
+#include "InfoDialog.h"
 #include "Viewer.h"
 
 namespace Ui {
@@ -26,7 +27,7 @@ public:
 public slots:
   void openFile();
   void openFile(const QString& path);
-
+  void showInfo();
   void createPointCloud(QString shape, int points, bool asSurface);
 
 protected:
@@ -42,6 +43,7 @@ private:
   DisplayOptionsDialog* m_displayOptions;
   CreatePointCloudDialog* m_createOptions;
   StereoOptionsDialog* m_stereoOptions;
+  InfoDialog* m_infoDialog;
 };
 
 #endif // MAINWINDOW_H

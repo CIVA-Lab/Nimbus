@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     PointCloud.cpp \
     PLYLoader.cpp \
     PointGenerator.cpp \
-    StereoOptionsDialog.cpp
+    StereoOptionsDialog.cpp \
+    InfoDialog.cpp
 
 HEADERS  += MainWindow.h \
     Viewer.h \
@@ -34,12 +35,14 @@ HEADERS  += MainWindow.h \
     PointCloud.h \
     PLYLoader.h \
     PointGenerator.h \
-    StereoOptionsDialog.h
+    StereoOptionsDialog.h \
+    InfoDialog.h
 
 FORMS    += MainWindow.ui \
     DisplayOptionsDialog.ui \
     CreatePointCloudDialog.ui \
-    StereoOptionsDialog.ui
+    StereoOptionsDialog.ui \
+    InfoDialog.ui
 
 OTHER_FILES += \
     Nimbus.rc

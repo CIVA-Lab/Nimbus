@@ -74,6 +74,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // Hide option to export movie from flight path; Not ready for other users
     // fileMenu->addAction("Save Path Movie", m_viewer, SLOT(savePathMovie()));
 
+    m_infoDialog = new InfoDialog(this);
+    fileMenu->addAction("Info", this, SLOT(showInfo()),
+                        QKeySequence("Ctrl+I"));
+
     fileMenu->addAction("Quit", qApp, SLOT(quit()));
 
     m_displayOptions = new DisplayOptionsDialog(this);
@@ -253,6 +257,13 @@ void MainWindow::openFile(const QString &path)
 
   QMessageBox::critical(this, "Unable to open file",
                         path + " is not a supported format.");
+}
+
+void MainWindow::showInfo()
+{
+  m_infoDialog->setOpenGLInfo(m_viewer->openGLInfo());
+  m_infoDialog->setPointCloudInfo(m_viewer->pointCloudInfo());
+  m_infoDialog->show();
 }
 
 bool MainWindow::canRead(const QString &path)

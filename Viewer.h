@@ -34,6 +34,9 @@ public:
 
   StereoMode stereoMode() const { return m_stereoMode; }
 
+  QStringList openGLInfo();
+  QStringList pointCloudInfo();
+
 signals:
   void pointSizeChanged(int pointSize);
   void pointDensityChanged(int pointDensity);
@@ -141,6 +144,7 @@ private:
   Vec m_turntableUp;
   bool m_turntableStarted;
 
+  PointCloud m_pointCloud;
 };
 
 #endif // VIEWER_H

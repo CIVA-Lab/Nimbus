@@ -55,6 +55,8 @@ Viewer::Viewer(QWidget *parent) :
 
 bool Viewer::setPointCloud(const PointCloud &cloud)
 {
+  m_pointCloud = cloud;
+
   if(!bindToVertexBuffer(cloud.pointData()))
     return false;
 
@@ -94,6 +96,51 @@ bool Viewer::multisampleAvailable() const
 bool Viewer::supportsHardwareStereo() const
 {
   return format().stereo();
+}
+
+// Returns label/value pairs separated by a semicolon
+QStringList Viewer::openGLInfo()
+{
+  QStringList result;
+
+  // Context must be current when querying values
+  makeCurrent();
+
+  result << ("OpenGL Vendor;" +  QString((const char *)glGetString(GL_VENDOR)));
+  result << ("OpenGL Version;" + QString::number(format().majorVersion()) + "."
+             + QString::number(format().minorVersion()));
+  result << ("OpenGL Renderer;" + QString((const char *)glGetString(GL_RENDERER)));
+  result << ("Hardware Stereo Support;"
+             + (supportsHardwareStereo() ? QString("true") : QString("false")));
+
+  result << ("Multisample Support;"
+            + (multisampleAvailable() ? QString("true") : QString("false")));
+
+  result << ("Swap Interval;" + QString::number(format().swapInterval()));
+  return result;
+}
+
+QStringList Viewer::pointCloudInfo()
+{
+  QStringList result;
+
+  result << ("Points;" + QString::number(m_vertexCount));
+  result << ("Contains Color;"
+             + (m_pointCloud.hasColor() ? QString("true") : QString("false")));
+  result << ("Cameras;" + QString::number(m_fov.count()));
+
+  float x = m_pointCloud.boundingBoxMinimum().x();
+  float y = m_pointCloud.boundingBoxMinimum().y();
+  float z = m_pointCloud.boundingBoxMinimum().z();
+
+  result << ("Minimum;" + QString("(%1, %2, %3)").arg(x).arg(y).arg(z));
+
+  x = m_pointCloud.boundingBoxMaximum().x();
+  y = m_pointCloud.boundingBoxMaximum().y();
+  z = m_pointCloud.boundingBoxMaximum().z();
+
+  result << ("Maximum;" + QString("(%1, %2, %3)").arg(x).arg(y).arg(z));
+  return result;
 }
 
 void Viewer::setPointSize(int pointSize)
