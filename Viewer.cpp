@@ -117,6 +117,7 @@ QStringList Viewer::openGLInfo()
             + (multisampleAvailable() ? QString("true") : QString("false")));
 
   result << ("Swap Interval;" + QString::number(format().swapInterval()));
+  result << ("Pointer size;" + QString::number(sizeof(void *) * 8) + " bits");
   return result;
 }
 

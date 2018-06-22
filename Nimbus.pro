@@ -7,6 +7,8 @@ ICON = Nimbus.icns
 win32 {
 #CONFIG += console
 RC_FILE = Nimbus.rc
+DEFINES += QGLVIEWER_STATIC
+LIBS += -lopengl32 -lglu32
 }
 
 unix:!macx {
