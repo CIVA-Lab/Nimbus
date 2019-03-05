@@ -2,6 +2,7 @@ Nimbus.pro.user
 *.o
 Nimbus.app
 moc_*.cpp
+moc_*.h
 ui_*.h
 Makefile
 .qmake.stash
