@@ -4,6 +4,11 @@ TARGET = Nimbus
 TEMPLATE = app
 ICON = Nimbus.icns
 
+CONFIG(release)
+{
+  CONFIG += optimize_full
+}
+
 win32 {
 #CONFIG += console
 RC_FILE = Nimbus.rc
@@ -13,6 +18,7 @@ LIBS += -lopengl32 -lglu32
 
 unix:!macx {
 DEFINES += NO_VBLANK_SYNC
+LIBS += -lGLU
 }
 
 INCLUDEPATH += 3rdparty/rply
