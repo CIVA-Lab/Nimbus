@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QtPlugin>
 #include <QStringList>
 #include <QFileInfo>
@@ -23,21 +24,12 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    // Get list of passed-in arguments
-    QStringList args = a.arguments();
-    if(!args.isEmpty())
-    {
-      // Remove application path from list (if present)
-      QFileInfo info(args.at(0));
-      if(info.absoluteFilePath() == a.applicationFilePath())
-      {
-        args.removeAt(0);
-      }
-    }
+    QCommandLineParser parser;
+    parser.process(a);
+    QStringList args = parser.positionalArguments();
 
-    // Any remaining arguments are paths to open; open first only
     if(!args.isEmpty())
-      w.openFile(args.at(0));
+      w.openFile(args.first());
 
     return a.exec();
 }
