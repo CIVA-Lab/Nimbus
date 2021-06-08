@@ -23,6 +23,14 @@ LIBS += -lGLU
 
 INCLUDEPATH += 3rdparty/rply
 
+contains(READERS, lastools) {
+  INCLUDEPATH += 3rdparty/include/LASlib
+  LIBS += -L $$PWD/3rdparty/lib/LASlib -lLASlib
+  DEFINES += READER_LASTOOLS
+  SOURCES += LASLoader.cpp
+  HEADERS += LASLoader.h
+}
+
 SOURCES += main.cpp\
         MainWindow.cpp \
     Viewer.cpp \

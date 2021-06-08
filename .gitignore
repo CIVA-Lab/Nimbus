@@ -7,3 +7,6 @@ ui_*.h
 Makefile
 .qmake.stash
 qrc_*.cpp
+.DS_Store
+3rdparty/lib
+3rdparty/include

@@ -21,6 +21,10 @@
 
 #include "rply.h"
 
+#ifdef READER_LASTOOLS
+  #include "LASLoader.h"
+#endif
+
 #include "PointCloud.h"
 #include "PLYLoader.h"
 #include "PointGenerator.h"
@@ -42,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Enable sample buffers
     format.setOption(QGL::SampleBuffers);
     // Request alpha buffer
-    format.setAlpha(true);
+//    format.setAlpha(true);
     // Request stereo
     format.setStereo(true);
 
@@ -255,6 +259,33 @@ void MainWindow::openFile(const QString &path)
     }
   }
 
+#ifdef READER_LASTOOLS
+  if(LASLoader::canRead(path))
+  {
+    qDebug() << "LASLoader::canRead() reports success";
+    LASLoader loader;
+    if(loader.open(path))
+    {
+      QProgressDialog progress(this);
+      progress.setWindowModality(Qt::WindowModal);
+      progress.setRange(0, 100);
+      progress.setMinimumDuration(1000);
+      progress.setAutoClose(false);
+
+      connect(&loader, SIGNAL(progress(int)), &progress, SLOT(setValue(int)));
+      connect(&progress, SIGNAL(canceled()), &loader, SLOT(cancel()));
+
+      PointCloud cloud = loader.load();
+      cloud.shuffle();
+      m_viewer->setPointCloud(cloud);
+
+      progress.close();
+
+      return;
+    }
+  }
+#endif
+
   QMessageBox::critical(this, "Unable to open file",
                         path + " is not a supported format.");
 }
@@ -268,7 +299,11 @@ void MainWindow::showInfo()
 
 bool MainWindow::canRead(const QString &path)
 {
+#ifdef READER_LASTOOLS
+  return PLYLoader::canRead(path) || LASLoader::canRead(path);
+#else
   return PLYLoader::canRead(path);
+#endif
 }
 
 void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
