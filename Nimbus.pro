@@ -53,7 +53,8 @@ FORMS    += MainWindow.ui \
     InfoDialog.ui
 
 OTHER_FILES += \
-    Nimbus.rc
+    Nimbus.rc \
+    README.md
 
 RESOURCES += \
     Nimbus.qrc
@@ -63,7 +64,6 @@ CONFIG(static):{
   DEFINES += NIMBUS_STATIC
   DEFINES += QGLVIEWER_STATIC
 }
-
 
 # libQGLViewer source and headers
 DEFINES *= NO_VECTORIAL_RENDER
