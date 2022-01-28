@@ -6,7 +6,11 @@
 #include <QPixmap>
 #include "PointCloud.h"
 
-using namespace qglviewer;
+using qglviewer::KeyFrameInterpolator;
+using qglviewer::ManipulatedFrame;
+using qglviewer::Quaternion;
+using qglviewer::Vec;
+
 class Viewer : public QGLViewer
 {
     Q_OBJECT

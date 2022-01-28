@@ -9,8 +9,6 @@
 // For pi constant
 #include <cmath>
 
-using namespace qglviewer;
-
 // Necessary for older windows OpenGL
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE  0x809D
@@ -254,7 +252,7 @@ void Viewer::setFastInteraction(bool value)
 void Viewer::restoreView()
 {
   // Restore default view by creating new camera and fitting scene
-  setCamera(new Camera());
+  setCamera(new qglviewer::Camera());
   showEntireScene();
 
   // This changes some parameters related to stereo; force refresh
