@@ -21,6 +21,7 @@
 
 #include "rply.h"
 
+#include "KRtCamera.h"
 #include "PointCloud.h"
 #include "PLYLoader.h"
 #include "PointGenerator.h"
@@ -66,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu *fileMenu = menuBar()->addMenu("File");
     fileMenu->addAction("Open File...", this, SLOT(openFile()),
                         QKeySequence::Open);
+    fileMenu->addAction("Open Cameras...", this, SLOT(openCameras()));
     fileMenu->addAction("Create Point Cloud...", m_createOptions,
                         SLOT(show()));
     connect(m_createOptions, SIGNAL(accepted(QString,int,bool)),
@@ -257,6 +259,43 @@ void MainWindow::openFile(const QString &path)
 
   QMessageBox::critical(this, "Unable to open file",
                         path + " is not a supported format.");
+}
+
+void MainWindow::openCameras()
+{
+  QStringList paths = QFileDialog::getOpenFileNames(this, "Open KRt Files");
+  openCameras(paths);
+}
+
+void MainWindow::openCameras(const QStringList &paths)
+{
+  // Clear any existing cameras on viewer
+  m_viewer->camera()->deletePath(1);
+
+  for(const QString &p : paths)
+  {
+    KRtCamera krt = KRtCamera::load(p);
+    if(!krt.isNull())
+    {
+      m_viewer->camera()->setPosition(Vec(krt.position()));
+      m_viewer->camera()->setUpVector(Vec(krt.up()));
+      m_viewer->camera()->setViewDirection(Vec(krt.direction()));
+
+      float fov = 2.0 * qAtan2(krt.imagePlaneCenter().y(), krt.focalLength());
+      m_viewer->camera()->setFieldOfView(fov);
+
+      m_viewer->camera()->addKeyFrameToPath(1);
+    }
+  }
+
+  // Check that keyframes have been added to path 1
+  if(m_viewer->camera()->keyFrameInterpolator(1) != NULL)
+  {
+    connect(m_viewer->camera()->keyFrameInterpolator(1),
+            SIGNAL(interpolated()), m_viewer, SLOT(updateGL()));
+
+    m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
+  }
 }
 
 void MainWindow::showInfo()

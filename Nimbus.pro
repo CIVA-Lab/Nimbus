@@ -24,7 +24,8 @@ LIBS += -lGLU
 INCLUDEPATH += 3rdparty/rply
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
+    KRtCamera.cpp \
+    MainWindow.cpp \
     Viewer.cpp \
     DisplayOptionsDialog.cpp \
     CreatePointCloudDialog.cpp \
@@ -36,6 +37,7 @@ SOURCES += main.cpp\
     InfoDialog.cpp
 
 HEADERS  += MainWindow.h \
+    KRtCamera.h \
     Viewer.h \
     DisplayOptionsDialog.h \
     CreatePointCloudDialog.h \

@@ -27,6 +27,10 @@ public:
 public slots:
   void openFile();
   void openFile(const QString& path);
+
+  void openCameras();
+  void openCameras(const QStringList& paths);
+
   void showInfo();
   void createPointCloud(QString shape, int points, bool asSurface);
 
