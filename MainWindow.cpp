@@ -73,8 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_createOptions, SIGNAL(accepted(QString,int,bool)),
             SLOT(createPointCloud(QString,int,bool)));
 
-    // Hide option to export movie from flight path; Not ready for other users
-    // fileMenu->addAction("Save Path Movie", m_viewer, SLOT(savePathMovie()));
+    fileMenu->addAction("Export Path Movie...", this, SLOT(exportPathMovie()));
 
     m_infoDialog = new InfoDialog(this);
     fileMenu->addAction("Info", this, SLOT(showInfo()),
@@ -326,6 +325,16 @@ void MainWindow::createPointCloud(QString shape, int count, bool asSurface)
   progress.hide();
 
   m_viewer->setPointCloud(cloud);
+}
+
+void MainWindow::exportPathMovie()
+{
+  // Get directory for export
+  QString dir =
+      QFileDialog::getExistingDirectory(this, "Choose export location");
+
+  if(!dir.isNull())
+    m_viewer->savePathMovie(dir);
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

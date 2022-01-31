@@ -836,10 +836,10 @@ void Viewer::toggleLogo()
   update();
 }
 
-void Viewer::savePathMovie()
+void Viewer::savePathMovie(const QString& directory = QString())
 {
-  setSnapshotFormat("PNG");
-  setSnapshotFileName("Snap");
+  setSnapshotFormat("JPEG");
+  setSnapshotFileName(directory.isNull() ? "Frame" : directory + "/Frame");
 
   connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
 
@@ -848,11 +848,9 @@ void Viewer::savePathMovie()
 
   for(int i = 0; i < kfi->numberOfKeyFrames(); ++i)
   {
-    camera()->setFieldOfView(m_fov.at(i));
     kfi->interpolateAtTime(kfi->keyFrameTime(i));
   }
   disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-
 }
 
 QString Viewer::speedToString()

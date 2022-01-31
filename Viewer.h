@@ -90,7 +90,7 @@ public slots:
 
   void toggleLogo();
 
-  void savePathMovie();
+  void savePathMovie(const QString &directory);
 
 protected:
   void init();

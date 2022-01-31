@@ -34,6 +34,8 @@ public slots:
   void showInfo();
   void createPointCloud(QString shape, int points, bool asSurface);
 
+  void exportPathMovie();
+
 protected:
   void closeEvent(QCloseEvent *);
   void dragEnterEvent(QDragEnterEvent *);
