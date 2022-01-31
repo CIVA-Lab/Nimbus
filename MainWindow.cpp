@@ -262,7 +262,19 @@ void MainWindow::openFile(const QString &path)
 
 void MainWindow::openCameras()
 {
-  QStringList paths = QFileDialog::getOpenFileNames(this, "Open KRt Files");
+  // Get directory for KRt files
+  QString cameraDir =
+      QFileDialog::getExistingDirectory(this, "Select KRt Directory");
+
+  // Get list of files from directory
+  QDir dir(cameraDir, "*.*", QDir::Name, QDir::Files | QDir::Readable);
+  QStringList relativePaths = dir.entryList();
+  QStringList paths;
+
+  for(const QString &path : qAsConst(relativePaths))
+  {
+    paths.push_back(dir.absoluteFilePath(path));
+  }
   openCameras(paths);
 }
 
@@ -295,6 +307,8 @@ void MainWindow::openCameras(const QStringList &paths)
 
     m_viewer->camera()->keyFrameInterpolator(1)->setInterpolationSpeed(4.0);
   }
+
+  m_viewer->update();
 }
 
 void MainWindow::showInfo()
